@@ -1,0 +1,177 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: >-
+      ${{ github.repository == 'MareTecreate/cdk-excavator' &&
+          github.repository_id == '1372739875' &&
+          toJSON(github.event.repository.private) == 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify tag commit is on main
+        shell: bash
+        run: |
+          tag_commit="$(git rev-list -n 1 "$GITHUB_REF")"
+          test -n "$tag_commit"
+          git show-ref --verify --quiet refs/remotes/origin/main
+          git merge-base --is-ancestor "$tag_commit" refs/remotes/origin/main
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.2"
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Check release version
+        run: pnpm release:check
+      - name: Check release notes
+        run: test -f "docs/release-notes/${GITHUB_REF_NAME}.md"
+      - name: Build
+        run: pnpm build
+      - name: Audit production dependencies
+        run: pnpm audit:prod
+      - name: Verify npm packages
+        run: pnpm package:verify
+      - name: Check forbidden AWS APIs
+        run: pnpm check:forbidden
+
+  binaries:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            output: release/cdkx-linux-x64
+            artifact: cdkx-linux-x64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            output: release/cdkx-windows-x64.exe
+            artifact: cdkx-windows-x64.exe
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+            output: release/cdkx-macos-arm64
+            artifact: cdkx-macos-arm64
+          - os: macos-15-intel
+            platform: darwin
+            arch: x64
+            output: release/cdkx-macos-x64
+            artifact: cdkx-macos-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.2"
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Verify runner architecture
+        run: node tools/verify-runner-architecture.mjs ${{ matrix.platform }} ${{ matrix.arch }}
+      - name: Build standalone binary
+        run: pnpm binary:build -- --output ${{ matrix.output }}
+      - name: Verify standalone binary and trust policy
+        run: node tools/verify-release-binary.mjs ${{ matrix.output }}
+      - name: Upload binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.output }}
+          if-no-files-found: error
+
+  npm-publish:
+    needs:
+      - validate
+      - binaries
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: public-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.2"
+          registry-url: "https://registry.npmjs.org"
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install and build
+        run: pnpm install --frozen-lockfile && pnpm build
+      - name: Install pinned npm publisher
+        run: npm install --prefix "$RUNNER_TEMP/npm-publisher" --ignore-scripts --no-audit --no-fund npm@12.0.2
+      - name: Publish CLI with trusted publishing
+        working-directory: packages/cli
+        run: node "$RUNNER_TEMP/npm-publisher/node_modules/npm/bin/npm-cli.js" publish --access public --provenance --ignore-scripts
+
+  github-release:
+    needs:
+      - binaries
+      - npm-publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: public-release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Download binaries
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: cdkx-*
+          path: release
+          merge-multiple: true
+      - name: Add licenses and notices
+        run: cp LICENSE NODE_LICENSE.txt THIRD_PARTY_NOTICES.txt release/
+      - name: Create checksums
+        working-directory: release
+        run: sha256sum cdkx-linux-x64 cdkx-macos-arm64 cdkx-macos-x64 cdkx-windows-x64.exe LICENSE NODE_LICENSE.txt THIRD_PARTY_NOTICES.txt > SHA256SUMS
+      - name: Publish or repair GitHub Release
+        shell: bash
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" release/* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" release/* --notes-file "docs/release-notes/${GITHUB_REF_NAME}.md" --verify-tag
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

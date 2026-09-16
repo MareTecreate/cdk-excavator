@@ -102,6 +102,8 @@ GitHub Release binary targets are Windows x64, Linux x64, macOS arm64 and macOS 
 
 Download assets and `SHA256SUMS` from the same Release. Verify before execution using `sha256sum --check SHA256SUMS` on Linux or `shasum -a 256 -c SHA256SUMS` on macOS. On Windows, compare `Get-FileHash .\cdkx-windows-x64.exe -Algorithm SHA256` with the checksum entry. Checksums and npm provenance do not replace OS code signing.
 
+To build for your current OS/CPU, use Node.js 22.23.2 and pnpm 11.7.0, then run `pnpm install --frozen-lockfile`, `pnpm binary:build` and `pnpm binary:verify`. Windows also requires Windows SDK `signtool.exe` and PowerShell 7 (`pwsh`); macOS requires `codesign`. The build prints the output path under `release/`. Verify an npm source build with `pnpm build` followed by `pnpm package:verify`; these distribution checks use synthetic input without AWS API calls.
+
 ## License
 
 [Apache-2.0](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.txt) and [bundled-schema provenance/licenses](packages/core/src/defaults/schemas/UPSTREAM.md). Standalone binaries also include the [Node.js license](NODE_LICENSE.txt).

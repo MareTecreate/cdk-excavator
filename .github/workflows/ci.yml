@@ -1,0 +1,102 @@
+name: Distribution Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: distribution-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.2"
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Verify release metadata
+        run: pnpm release:check
+      - name: Build
+        run: pnpm build
+      - name: Audit production dependencies
+        run: pnpm audit:prod
+      - name: Verify npm package
+        run: pnpm package:verify
+      - name: Check forbidden AWS APIs
+        run: pnpm check:forbidden
+
+  binary-uat:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            output: release/cdkx-linux-x64
+            artifact: cdkx-linux-x64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            output: release/cdkx-windows-x64.exe
+            artifact: cdkx-windows-x64.exe
+          - os: macos-15
+            platform: darwin
+            arch: arm64
+            output: release/cdkx-macos-arm64
+            artifact: cdkx-macos-arm64
+          - os: macos-15-intel
+            platform: darwin
+            arch: x64
+            output: release/cdkx-macos-x64
+            artifact: cdkx-macos-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.2"
+      - name: Enable pnpm
+        run: corepack enable
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Verify runner architecture
+        run: node tools/verify-runner-architecture.mjs ${{ matrix.platform }} ${{ matrix.arch }}
+      - name: Build standalone binary
+        run: pnpm binary:build -- --output ${{ matrix.output }}
+      - name: Verify standalone binary and trust policy
+        run: node tools/verify-release-binary.mjs ${{ matrix.output }}
+
+  release-ready:
+    if: ${{ always() }}
+    needs: [test, binary-uat]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every pre-release gate
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+          BINARY_RESULT: ${{ needs.binary-uat.result }}
+        run: test "$TEST_RESULT" = success && test "$BINARY_RESULT" = success

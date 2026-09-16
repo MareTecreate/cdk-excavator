@@ -102,6 +102,8 @@ GitHub Releasesで配布する場合の対象はWindows x64、Linux x64、macOS 
 
 同じReleaseのassetと `SHA256SUMS` を取得し、実行前に検証します。Linuxは `sha256sum --check SHA256SUMS`、macOSは `shasum -a 256 -c SHA256SUMS`。Windowsでは `Get-FileHash .\cdkx-windows-x64.exe -Algorithm SHA256` の値を照合してください。checksumやnpm provenanceはOSコード署名の代替ではありません。
 
+使用中のOS/CPU向けにビルドする場合は、Node.js 22.23.2とpnpm 11.7.0で `pnpm install --frozen-lockfile`、`pnpm binary:build`、`pnpm binary:verify` を順に実行します。WindowsはWindows SDKの `signtool.exe` とPowerShell 7 (`pwsh`)、macOSは `codesign` も必要です。出力先は `release/` 配下で、ビルド時に表示されます。npm用ビルドは `pnpm build`、続いて `pnpm package:verify` で確認できます。これらの配布確認は架空入力を使い、AWS APIを呼びません。
+
 ## ライセンス
 
 [Apache-2.0](LICENSE)。[第三者ライセンス](THIRD_PARTY_NOTICES.txt)、[同梱schemaの出典・ライセンス](packages/core/src/defaults/schemas/UPSTREAM.md)を参照してください。standalone binaryには[Node.jsライセンス](NODE_LICENSE.txt)も適用されます。

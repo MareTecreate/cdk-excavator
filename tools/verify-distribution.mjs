@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
+  lstat,
   mkdir,
   mkdtemp,
   readFile,
@@ -11,7 +12,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -270,17 +271,22 @@ export async function verifyPackage() {
         await readFile(join(root, "packages/cli/dist/cli.js")),
       ),
     );
-    assert.equal(
-      run(
-        "npm",
-        ["exec", "--offline", "--", "cdkx", "--version"],
-        consumer,
-      ).trim(),
-      `cdkx ${manifest.version}`,
+    const installedManifest = JSON.parse(
+      await readFile(join(installed, "package.json"), "utf8"),
     );
-    await verifyCli(process.execPath, [join(installed, "bin/cdkx.mjs")]);
+    assert.deepEqual(Object.keys(installedManifest.bin), ["cdkx"]);
+    const binEntry = resolve(installed, installedManifest.bin.cdkx);
+    assert.equal(binEntry, join(installed, "bin/cdkx.mjs"));
+    const binLink = join(consumer, "node_modules/.bin/cdkx");
+    if (process.platform === "win32") {
+      // npm exec uses cmd.exe internally; inspect its shim without executing it.
+      assert((await lstat(`${binLink}.cmd`)).isFile());
+    } else {
+      assert.equal(await realpath(binLink), await realpath(binEntry));
+    }
+    await verifyCli(process.execPath, [binEntry]);
     console.log(
-      `Distribution npm package ${manifest.version}: six files, isolated install and bin resolution passed.`,
+      `Distribution npm package ${manifest.version}: six files, isolated install and declared bin startup passed.`,
     );
   } finally {
     await cleanup(temporary, "cdkx-distribution-package-");
@@ -305,25 +311,34 @@ async function fileHashes(directory, path = "") {
 }
 
 function run(command, args, cwd, allowed = [0]) {
-  const windowsCommand =
-    process.platform === "win32" && ["pnpm", "npm"].includes(command);
-  const result = spawnSync(
-    windowsCommand ? (process.env.ComSpec ?? "cmd.exe") : command,
-    windowsCommand ? ["/d", "/s", "/c", `${command}.cmd`, ...args] : args,
-    {
-      cwd,
-      encoding: "utf8",
-      timeout: 300_000,
-      maxBuffer: 8 * 1024 * 1024,
-      windowsHide: true,
-      env: {
-        ...process.env,
-        NO_COLOR: "1",
-        NODE_PATH: "",
-        AWS_EC2_METADATA_DISABLED: "true",
-      },
+  let executable = command;
+  let parameters = args;
+  if (process.platform === "win32" && ["pnpm", "npm"].includes(command)) {
+    const entry =
+      command === "pnpm"
+        ? process.env.npm_execpath
+        : join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js");
+    assert(
+      entry && isAbsolute(entry) && /\.(?:c?js|mjs)$/iu.test(entry),
+      "Run this verifier through pnpm using a Node.js installation that includes npm.",
+    );
+    executable = process.execPath;
+    parameters = [entry, ...args];
+  }
+  const result = spawnSync(executable, parameters, {
+    cwd,
+    shell: false,
+    encoding: "utf8",
+    timeout: 300_000,
+    maxBuffer: 8 * 1024 * 1024,
+    windowsHide: true,
+    env: {
+      ...process.env,
+      NO_COLOR: "1",
+      NODE_PATH: "",
+      AWS_EC2_METADATA_DISABLED: "true",
     },
-  );
+  });
   if (!allowed.includes(result.status))
     throw new Error(
       `Distribution check failed (${result.status}): ${result.stderr || result.stdout || result.error?.message}`,

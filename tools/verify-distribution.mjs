@@ -28,7 +28,9 @@ const expectedPackageFiles = [
 ];
 
 export async function verifyCli(command, prefix = []) {
-  const temporary = await mkdtemp(join(tmpdir(), "cdkx-distribution-smoke-"));
+  const temporary = await mkdtemp(
+    join(await realpath(tmpdir()), "cdkx-distribution-smoke-"),
+  );
   try {
     const cli = (args, allowed = [0]) =>
       run(command, [...prefix, ...args], temporary, allowed);
@@ -223,7 +225,9 @@ export async function verifyCli(command, prefix = []) {
 }
 
 export async function verifyPackage() {
-  const temporary = await mkdtemp(join(tmpdir(), "cdkx-distribution-package-"));
+  const temporary = await mkdtemp(
+    join(await realpath(tmpdir()), "cdkx-distribution-package-"),
+  );
   try {
     run(
       "pnpm",
@@ -328,7 +332,7 @@ function run(command, args, cwd, allowed = [0]) {
 }
 
 async function cleanup(directory, prefix) {
-  assert.equal(dirname(directory), resolve(tmpdir()));
+  assert.equal(dirname(directory), await realpath(tmpdir()));
   assert(basename(directory).startsWith(prefix));
   assert.equal(await realpath(directory), directory);
   await rm(directory, {

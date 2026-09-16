@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "propertyRules": [
+    {
+      "code": "GAP-4",
+      "resourceType": "AWS::EC2::SecurityGroup",
+      "propertyPath": "/properties/GroupId",
+      "severity": "info",
+      "message": "Security group ID is assigned by AWS and should not be authored as IaC input."
+    }
+  ],
+  "resourceRules": []
+}

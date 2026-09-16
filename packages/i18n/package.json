@@ -1,0 +1,30 @@
+{
+  "name": "@cdk-excavator/i18n",
+  "version": "0.1.0",
+  "description": "English and Japanese message catalogs for cdk-excavator.",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MareTecreate/cdk-excavator.git",
+    "directory": "packages/i18n"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node ../../tools/clean-path.mjs dist tsconfig.tsbuildinfo && tsc -p tsconfig.build.json && node ../../tools/copy-dir.mjs src/messages dist/messages"
+  }
+}

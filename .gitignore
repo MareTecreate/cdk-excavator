@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+.aws/
+cdkx-work/
+cdkx.out/
+cdk.out/
+inventory.json
+scope.json
+model.json
+gaps.json

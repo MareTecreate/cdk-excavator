@@ -1,0 +1,3606 @@
+[
+  {
+    "typeName": "AWS::EC2::Instance",
+    "primaryIdentifier": ["/properties/InstanceId"],
+    "readOnlyProperties": [
+      "/properties/InstanceId",
+      "/properties/PrivateIp",
+      "/properties/PublicDnsName",
+      "/properties/PublicIp",
+      "/properties/PrivateDnsName",
+      "/properties/VpcId",
+      "/properties/State"
+    ],
+    "writeOnlyProperties": [
+      "/properties/BlockDeviceMappings/*/NoDevice",
+      "/properties/BlockDeviceMappings/*/VirtualName",
+      "/properties/LicenseSpecifications",
+      "/properties/AdditionalInfo",
+      "/properties/Ipv6AddressCount",
+      "/properties/Ipv6Addresses",
+      "/properties/PropagateTagsToVolumeOnCreation"
+    ],
+    "createOnlyProperties": [
+      "/properties/AvailabilityZone",
+      "/properties/CpuOptions",
+      "/properties/ElasticGpuSpecifications",
+      "/properties/ElasticInferenceAccelerators",
+      "/properties/EnclaveOptions",
+      "/properties/HibernationOptions",
+      "/properties/HostResourceGroupArn",
+      "/properties/ImageId",
+      "/properties/Ipv6AddressCount",
+      "/properties/Ipv6Addresses",
+      "/properties/KeyName",
+      "/properties/LaunchTemplate",
+      "/properties/LicenseSpecifications",
+      "/properties/NetworkInterfaces",
+      "/properties/PlacementGroupName",
+      "/properties/PrivateIpAddress",
+      "/properties/SecurityGroups",
+      "/properties/SubnetId"
+    ],
+    "additionalProperties": false,
+    "allOf": [{}],
+    "definitions": {
+      "AssociationParameter": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "BlockDeviceMapping": {
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "oneOf": [
+              {
+                "required": ["VirtualName"]
+              },
+              {
+                "required": ["Ebs"]
+              },
+              {
+                "required": ["NoDevice"]
+              }
+            ]
+          }
+        ],
+        "properties": {
+          "DeviceName": {
+            "type": "string"
+          },
+          "Ebs": {
+            "$ref": "#/definitions/Ebs"
+          },
+          "NoDevice": {
+            "additionalProperties": false,
+            "type": "object"
+          },
+          "VirtualName": {
+            "type": "string"
+          }
+        },
+        "required": ["DeviceName"],
+        "type": "object"
+      },
+      "Ebs": {
+        "additionalProperties": false,
+        "properties": {
+          "DeleteOnTermination": {
+            "type": "boolean"
+          },
+          "Encrypted": {
+            "type": "boolean"
+          },
+          "Iops": {
+            "type": "integer"
+          },
+          "KmsKeyId": {
+            "anyOf": [{}, {}, {}],
+            "type": "string"
+          },
+          "SnapshotId": {
+            "type": "string"
+          },
+          "VolumeSize": {
+            "type": "integer"
+          },
+          "VolumeType": {
+            "enum": ["gp2", "gp3", "io1", "io2", "sc1", "st1", "standard"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ElasticGpuSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "Type": {
+            "type": "string"
+          }
+        },
+        "required": ["Type"],
+        "type": "object"
+      },
+      "ElasticInferenceAccelerator": {
+        "additionalProperties": false,
+        "properties": {
+          "Count": {
+            "type": "integer"
+          },
+          "Type": {
+            "type": "string"
+          }
+        },
+        "required": ["Type"],
+        "type": "object"
+      },
+      "EnaSrdSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "EnaSrdEnabled": {
+            "type": "boolean"
+          },
+          "EnaSrdUdpSpecification": {
+            "$ref": "#/definitions/EnaSrdUdpSpecification"
+          }
+        },
+        "type": "object"
+      },
+      "EnaSrdUdpSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "EnaSrdUdpEnabled": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "InstanceIpv6Address": {
+        "additionalProperties": false,
+        "properties": {
+          "Ipv6Address": {
+            "type": "string"
+          }
+        },
+        "required": ["Ipv6Address"],
+        "type": "object"
+      },
+      "LaunchTemplateSpecification": {
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "required": ["LaunchTemplateName", "Version"]
+          },
+          {
+            "required": ["LaunchTemplateId", "Version"]
+          }
+        ],
+        "properties": {
+          "LaunchTemplateId": {
+            "type": "string"
+          },
+          "LaunchTemplateName": {
+            "type": "string"
+          },
+          "Version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LicenseSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "LicenseConfigurationArn": {
+            "type": "string"
+          }
+        },
+        "required": ["LicenseConfigurationArn"],
+        "type": "object"
+      },
+      "MetadataOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "HttpEndpoint": {
+            "enum": ["disabled", "enabled"],
+            "type": "string"
+          },
+          "HttpProtocolIpv6": {
+            "enum": ["disabled", "enabled"],
+            "type": "string"
+          },
+          "HttpPutResponseHopLimit": {
+            "type": "integer"
+          },
+          "HttpTokens": {
+            "enum": ["optional", "required"],
+            "type": "string"
+          },
+          "InstanceMetadataTags": {
+            "enum": ["disabled", "enabled"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NetworkInterface": {
+        "additionalProperties": false,
+        "allOf": [{}],
+        "properties": {
+          "AssociateCarrierIpAddress": {
+            "type": "boolean"
+          },
+          "AssociatePublicIpAddress": {
+            "type": "boolean"
+          },
+          "DeleteOnTermination": {
+            "type": "boolean"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "DeviceIndex": {
+            "type": "string"
+          },
+          "EnaSrdSpecification": {
+            "$ref": "#/definitions/EnaSrdSpecification"
+          },
+          "GroupSet": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "Ipv6AddressCount": {
+            "type": "integer"
+          },
+          "Ipv6Addresses": {
+            "items": {
+              "$ref": "#/definitions/InstanceIpv6Address"
+            },
+            "type": "array"
+          },
+          "NetworkInterfaceId": {
+            "type": "string"
+          },
+          "PrivateIpAddress": {
+            "type": "string"
+          },
+          "PrivateIpAddresses": {
+            "items": {
+              "$ref": "#/definitions/PrivateIpAddressSpecification"
+            },
+            "type": "array"
+          },
+          "SecondaryPrivateIpAddressCount": {
+            "type": "integer"
+          },
+          "SubnetId": {
+            "type": "string"
+          }
+        },
+        "required": ["DeviceIndex"],
+        "type": "object"
+      },
+      "PrivateDnsNameOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "EnableResourceNameDnsAAAARecord": {
+            "type": "boolean"
+          },
+          "EnableResourceNameDnsARecord": {
+            "type": "boolean"
+          },
+          "HostnameType": {
+            "enum": ["ip-name", "resource-name"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PrivateIpAddressSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "Primary": {
+            "type": "boolean"
+          },
+          "PrivateIpAddress": {
+            "type": "string"
+          }
+        },
+        "required": ["PrivateIpAddress", "Primary"],
+        "type": "object"
+      },
+      "SsmAssociation": {
+        "additionalProperties": false,
+        "properties": {
+          "AssociationParameters": {
+            "items": {
+              "$ref": "#/definitions/AssociationParameter"
+            },
+            "type": "array"
+          },
+          "DocumentName": {
+            "type": "string"
+          }
+        },
+        "required": ["DocumentName"],
+        "type": "object"
+      },
+      "State": {
+        "additionalProperties": false,
+        "properties": {
+          "Code": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "Volume": {
+        "additionalProperties": false,
+        "properties": {
+          "Device": {
+            "type": "string"
+          },
+          "VolumeId": {
+            "type": "string"
+          }
+        },
+        "required": ["VolumeId", "Device"],
+        "type": "object"
+      }
+    },
+    "properties": {
+      "AdditionalInfo": {
+        "type": "string"
+      },
+      "Affinity": {
+        "enum": ["default", "host"],
+        "type": "string"
+      },
+      "AvailabilityZone": {
+        "type": "string"
+      },
+      "BlockDeviceMappings": {
+        "items": {
+          "$ref": "#/definitions/BlockDeviceMapping"
+        },
+        "type": "array"
+      },
+      "CpuOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "CoreCount": {
+            "type": "integer"
+          },
+          "ThreadsPerCore": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "CreditSpecification": {
+        "additionalProperties": false,
+        "properties": {
+          "CPUCredits": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DisableApiTermination": {
+        "type": "boolean"
+      },
+      "EbsOptimized": {
+        "type": "boolean"
+      },
+      "ElasticGpuSpecifications": {
+        "items": {
+          "$ref": "#/definitions/ElasticGpuSpecification"
+        },
+        "type": "array"
+      },
+      "ElasticInferenceAccelerators": {
+        "items": {
+          "$ref": "#/definitions/ElasticInferenceAccelerator"
+        },
+        "type": "array"
+      },
+      "EnclaveOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "HibernationOptions": {
+        "additionalProperties": false,
+        "properties": {
+          "Configured": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "HostId": {
+        "type": "string"
+      },
+      "HostResourceGroupArn": {
+        "type": "string"
+      },
+      "IamInstanceProfile": {
+        "type": "string"
+      },
+      "ImageId": {
+        "type": "string"
+      },
+      "InstanceId": {
+        "type": "string"
+      },
+      "InstanceInitiatedShutdownBehavior": {
+        "enum": ["stop", "terminate"],
+        "type": "string"
+      },
+      "InstanceType": {
+        "type": "string"
+      },
+      "Ipv6AddressCount": {
+        "type": "integer"
+      },
+      "Ipv6Addresses": {
+        "items": {
+          "$ref": "#/definitions/InstanceIpv6Address"
+        },
+        "type": "array"
+      },
+      "KernelId": {
+        "type": "string"
+      },
+      "KeyName": {
+        "type": "string"
+      },
+      "LaunchTemplate": {
+        "$ref": "#/definitions/LaunchTemplateSpecification",
+        "type": "object"
+      },
+      "LicenseSpecifications": {
+        "items": {
+          "$ref": "#/definitions/LicenseSpecification"
+        },
+        "type": "array"
+      },
+      "MetadataOptions": {
+        "$ref": "#/definitions/MetadataOptions",
+        "type": "object"
+      },
+      "Monitoring": {
+        "type": "boolean"
+      },
+      "NetworkInterfaces": {
+        "items": {
+          "$ref": "#/definitions/NetworkInterface"
+        },
+        "type": "array"
+      },
+      "PlacementGroupName": {
+        "type": "string"
+      },
+      "PrivateDnsName": {
+        "type": "string"
+      },
+      "PrivateDnsNameOptions": {
+        "$ref": "#/definitions/PrivateDnsNameOptions",
+        "type": "object"
+      },
+      "PrivateIp": {
+        "type": "string"
+      },
+      "PrivateIpAddress": {
+        "type": "string"
+      },
+      "PropagateTagsToVolumeOnCreation": {
+        "type": "boolean"
+      },
+      "PublicDnsName": {
+        "type": "string"
+      },
+      "PublicIp": {
+        "type": "string"
+      },
+      "RamdiskId": {
+        "type": "string"
+      },
+      "SecurityGroupIds": {
+        "anyOf": [{}, {}],
+        "items": {
+          "anyOf": [{}, {}],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "SecurityGroups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "SourceDestCheck": {
+        "type": "boolean"
+      },
+      "SsmAssociations": {
+        "items": {
+          "$ref": "#/definitions/SsmAssociation"
+        },
+        "type": "array"
+      },
+      "State": {
+        "$ref": "#/definitions/State",
+        "type": "object"
+      },
+      "SubnetId": {
+        "type": "string"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      },
+      "Tenancy": {
+        "type": "string"
+      },
+      "UserData": {
+        "type": "string"
+      },
+      "Volumes": {
+        "items": {
+          "$ref": "#/definitions/Volume"
+        },
+        "type": "array"
+      },
+      "VpcId": {
+        "type": "string"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::RDS::DBInstance",
+    "primaryIdentifier": ["/properties/DBInstanceIdentifier"],
+    "readOnlyProperties": [
+      "/properties/AdditionalStorageVolumes/*/StorageOperationStatus",
+      "/properties/AdditionalStorageVolumes/*/StorageOperationPercentProgress",
+      "/properties/AutomaticRestartTime",
+      "/properties/CertificateDetails",
+      "/properties/CertificateDetails/CAIdentifier",
+      "/properties/CertificateDetails/ValidTill",
+      "/properties/Endpoint",
+      "/properties/Endpoint/Address",
+      "/properties/Endpoint/Port",
+      "/properties/Endpoint/HostedZoneId",
+      "/properties/DbiResourceId",
+      "/properties/DBInstanceArn",
+      "/properties/DBInstanceStatus",
+      "/properties/InstanceCreateTime",
+      "/properties/IsStorageConfigUpgradeAvailable",
+      "/properties/LatestRestorableTime",
+      "/properties/ListenerEndpoint",
+      "/properties/ListenerEndpoint/Address",
+      "/properties/ListenerEndpoint/Port",
+      "/properties/ListenerEndpoint/HostedZoneId",
+      "/properties/MasterUserSecret/SecretArn",
+      "/properties/PercentProgress",
+      "/properties/ReadReplicaDBClusterIdentifiers",
+      "/properties/ReadReplicaDBInstanceIdentifiers",
+      "/properties/ResumeFullAutomationModeTime",
+      "/properties/SecondaryAvailabilityZone",
+      "/properties/StatusInfos",
+      "/properties/StorageOperationStatus",
+      "/properties/StorageOperationPercentProgress"
+    ],
+    "writeOnlyProperties": [
+      "/properties/AllowMajorVersionUpgrade",
+      "/properties/AutomaticBackupReplicationKmsKeyId",
+      "/properties/CertificateRotationRestart",
+      "/properties/DBSnapshotIdentifier",
+      "/properties/DeleteAutomatedBackups",
+      "/properties/MasterUserAuthenticationType",
+      "/properties/MasterUserPassword",
+      "/properties/RestoreTime",
+      "/properties/SourceDBInstanceAutomatedBackupsArn",
+      "/properties/SourceDBInstanceIdentifier",
+      "/properties/SourceDbiResourceId",
+      "/properties/SourceRegion",
+      "/properties/TdeCredentialPassword",
+      "/properties/UseDefaultProcessorFeatures",
+      "/properties/UseLatestRestorableTime",
+      "/properties/ApplyImmediately"
+    ],
+    "createOnlyProperties": [
+      "/properties/BackupTarget",
+      "/properties/CharacterSetName",
+      "/properties/CustomIAMInstanceProfile",
+      "/properties/DBClusterIdentifier",
+      "/properties/DBInstanceIdentifier",
+      "/properties/DBName",
+      "/properties/DBSubnetGroupName",
+      "/properties/DBSystemId",
+      "/properties/KmsKeyId",
+      "/properties/MasterUsername",
+      "/properties/NcharCharacterSetName",
+      "/properties/SourceRegion",
+      "/properties/StorageEncrypted",
+      "/properties/Timezone"
+    ],
+    "additionalProperties": false,
+    "allOf": [{}],
+    "definitions": {
+      "AdditionalStorageVolume": {
+        "additionalProperties": false,
+        "properties": {
+          "AllocatedStorage": {
+            "type": "string"
+          },
+          "Iops": {
+            "type": "integer"
+          },
+          "MaxAllocatedStorage": {
+            "type": "integer"
+          },
+          "StorageOperationPercentProgress": {
+            "type": "integer"
+          },
+          "StorageOperationStatus": {
+            "type": "string"
+          },
+          "StorageThroughput": {
+            "type": "integer"
+          },
+          "StorageType": {
+            "type": "string"
+          },
+          "VolumeName": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CertificateDetails": {
+        "additionalProperties": false,
+        "properties": {
+          "CAIdentifier": {
+            "type": "string"
+          },
+          "ValidTill": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DBInstanceRole": {
+        "additionalProperties": false,
+        "properties": {
+          "FeatureName": {
+            "type": "string"
+          },
+          "RoleArn": {
+            "type": "string"
+          }
+        },
+        "required": ["FeatureName", "RoleArn"],
+        "type": "object"
+      },
+      "DBInstanceStatusInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "Message": {
+            "type": "string"
+          },
+          "Normal": {
+            "type": "boolean"
+          },
+          "Status": {
+            "type": "string"
+          },
+          "StatusType": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Endpoint": {
+        "additionalProperties": false,
+        "properties": {
+          "Address": {
+            "type": "string"
+          },
+          "HostedZoneId": {
+            "type": "string"
+          },
+          "Port": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MasterUserSecret": {
+        "additionalProperties": false,
+        "properties": {
+          "KmsKeyId": {
+            "anyOf": [{}, {}, {}],
+            "type": "string"
+          },
+          "SecretArn": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ProcessorFeature": {
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "enum": ["coreCount", "threadsPerCore"],
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Key"],
+        "type": "object"
+      }
+    },
+    "properties": {
+      "AdditionalStorageVolumes": {
+        "items": {
+          "$ref": "#/definitions/AdditionalStorageVolume"
+        },
+        "type": "array"
+      },
+      "AllocatedStorage": {
+        "type": "string"
+      },
+      "AllowMajorVersionUpgrade": {
+        "type": "boolean"
+      },
+      "ApplyImmediately": {
+        "type": "boolean"
+      },
+      "AssociatedRoles": {
+        "items": {
+          "$ref": "#/definitions/DBInstanceRole"
+        },
+        "type": "array"
+      },
+      "AutoMinorVersionUpgrade": {
+        "type": "boolean"
+      },
+      "AutomaticBackupReplicationKmsKeyId": {
+        "type": "string"
+      },
+      "AutomaticBackupReplicationRegion": {
+        "type": "string"
+      },
+      "AutomaticBackupReplicationRetentionPeriod": {
+        "type": "integer"
+      },
+      "AutomaticRestartTime": {
+        "type": "string"
+      },
+      "AvailabilityZone": {
+        "type": "string"
+      },
+      "BackupRetentionPeriod": {
+        "type": "integer"
+      },
+      "BackupTarget": {
+        "type": "string"
+      },
+      "CACertificateIdentifier": {
+        "type": "string"
+      },
+      "CertificateDetails": {
+        "$ref": "#/definitions/CertificateDetails"
+      },
+      "CertificateRotationRestart": {
+        "type": "boolean"
+      },
+      "CharacterSetName": {
+        "type": "string"
+      },
+      "CopyTagsToSnapshot": {
+        "type": "boolean"
+      },
+      "CustomIAMInstanceProfile": {
+        "type": "string"
+      },
+      "DBClusterIdentifier": {
+        "type": "string"
+      },
+      "DBClusterSnapshotIdentifier": {
+        "type": "string"
+      },
+      "DBInstanceArn": {
+        "type": "string"
+      },
+      "DBInstanceClass": {
+        "type": "string"
+      },
+      "DBInstanceIdentifier": {
+        "type": "string"
+      },
+      "DBInstanceStatus": {
+        "type": "string"
+      },
+      "DBName": {
+        "type": "string"
+      },
+      "DBParameterGroupName": {
+        "type": "string"
+      },
+      "DBSecurityGroups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "DBSnapshotIdentifier": {
+        "type": "string"
+      },
+      "DBSubnetGroupName": {
+        "type": "string"
+      },
+      "DBSystemId": {
+        "type": "string"
+      },
+      "DatabaseInsightsMode": {
+        "enum": ["advanced", "standard"],
+        "type": "string"
+      },
+      "DbiResourceId": {
+        "type": "string"
+      },
+      "DedicatedLogVolume": {
+        "type": "boolean"
+      },
+      "DeleteAutomatedBackups": {
+        "type": "boolean"
+      },
+      "DeletionProtection": {
+        "type": "boolean"
+      },
+      "Domain": {
+        "type": "string"
+      },
+      "DomainAuthSecretArn": {
+        "type": "string"
+      },
+      "DomainDnsIps": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "DomainFqdn": {
+        "type": "string"
+      },
+      "DomainIAMRoleName": {
+        "type": "string"
+      },
+      "DomainOu": {
+        "type": "string"
+      },
+      "EnableCloudwatchLogsExports": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "EnableIAMDatabaseAuthentication": {
+        "type": "boolean"
+      },
+      "EnablePerformanceInsights": {
+        "type": "boolean"
+      },
+      "Endpoint": {
+        "$ref": "#/definitions/Endpoint"
+      },
+      "Engine": {
+        "type": "string"
+      },
+      "EngineLifecycleSupport": {
+        "type": "string"
+      },
+      "EngineVersion": {
+        "type": "string"
+      },
+      "InstanceCreateTime": {
+        "type": "string"
+      },
+      "Iops": {
+        "type": "integer"
+      },
+      "IsStorageConfigUpgradeAvailable": {
+        "type": "boolean"
+      },
+      "KmsKeyId": {
+        "anyOf": [{}, {}, {}],
+        "type": "string"
+      },
+      "LatestRestorableTime": {
+        "type": "string"
+      },
+      "LicenseModel": {
+        "type": "string"
+      },
+      "ListenerEndpoint": {
+        "$ref": "#/definitions/Endpoint"
+      },
+      "ManageMasterUserPassword": {
+        "type": "boolean"
+      },
+      "MasterUserAuthenticationType": {
+        "enum": ["iam-db-auth", "password"],
+        "type": "string"
+      },
+      "MasterUserPassword": {
+        "type": "string"
+      },
+      "MasterUserSecret": {
+        "$ref": "#/definitions/MasterUserSecret"
+      },
+      "MasterUsername": {
+        "type": "string"
+      },
+      "MaxAllocatedStorage": {
+        "type": "integer"
+      },
+      "MonitoringInterval": {
+        "type": "integer"
+      },
+      "MonitoringRoleArn": {
+        "type": "string"
+      },
+      "MultiAZ": {
+        "type": "boolean"
+      },
+      "NcharCharacterSetName": {
+        "type": "string"
+      },
+      "NetworkType": {
+        "type": "string"
+      },
+      "OptionGroupName": {
+        "type": "string"
+      },
+      "PercentProgress": {
+        "type": "string"
+      },
+      "PerformanceInsightsKMSKeyId": {
+        "type": "string"
+      },
+      "PerformanceInsightsRetentionPeriod": {
+        "enum": [
+          7, 31, 62, 93, 124, 155, 186, 217, 248, 279, 310, 341, 372, 403, 434,
+          465, 496, 527, 558, 589, 620, 651, 682, 713, 731
+        ],
+        "type": "integer"
+      },
+      "Port": {
+        "type": "string"
+      },
+      "PreferredBackupWindow": {
+        "type": "string"
+      },
+      "PreferredMaintenanceWindow": {
+        "type": "string"
+      },
+      "ProcessorFeatures": {
+        "items": {
+          "$ref": "#/definitions/ProcessorFeature"
+        },
+        "type": "array"
+      },
+      "PromotionTier": {
+        "type": "integer"
+      },
+      "PubliclyAccessible": {
+        "type": "boolean"
+      },
+      "ReadReplicaDBClusterIdentifiers": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "ReadReplicaDBInstanceIdentifiers": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "ReplicaMode": {
+        "type": "string"
+      },
+      "RestoreTime": {
+        "type": "string"
+      },
+      "ResumeFullAutomationModeTime": {
+        "type": "string"
+      },
+      "SecondaryAvailabilityZone": {
+        "type": "string"
+      },
+      "SourceDBClusterIdentifier": {
+        "type": "string"
+      },
+      "SourceDBInstanceAutomatedBackupsArn": {
+        "type": "string"
+      },
+      "SourceDBInstanceIdentifier": {
+        "type": "string"
+      },
+      "SourceDbiResourceId": {
+        "type": "string"
+      },
+      "SourceRegion": {
+        "type": "string"
+      },
+      "StatusInfos": {
+        "items": {
+          "$ref": "#/definitions/DBInstanceStatusInfo"
+        },
+        "type": "array"
+      },
+      "StorageEncrypted": {
+        "type": "boolean"
+      },
+      "StorageOperationPercentProgress": {
+        "type": "integer"
+      },
+      "StorageOperationStatus": {
+        "type": "string"
+      },
+      "StorageThroughput": {
+        "type": "integer"
+      },
+      "StorageType": {
+        "type": "string"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      },
+      "TdeCredentialArn": {
+        "type": "string"
+      },
+      "TdeCredentialPassword": {
+        "type": "string"
+      },
+      "Timezone": {
+        "type": "string"
+      },
+      "UseDefaultProcessorFeatures": {
+        "type": "boolean"
+      },
+      "UseLatestRestorableTime": {
+        "type": "boolean"
+      },
+      "VPCSecurityGroups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::RDS::DBSubnetGroup",
+    "required": ["DBSubnetGroupDescription", "SubnetIds"],
+    "primaryIdentifier": ["/properties/DBSubnetGroupName"],
+    "readOnlyProperties": ["/properties/DBSubnetGroupArn"],
+    "createOnlyProperties": ["/properties/DBSubnetGroupName"],
+    "additionalProperties": false,
+    "definitions": {
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Key"],
+        "type": "object"
+      }
+    },
+    "properties": {
+      "DBSubnetGroupArn": {
+        "type": "string"
+      },
+      "DBSubnetGroupDescription": {
+        "type": "string"
+      },
+      "DBSubnetGroupName": {
+        "type": "string"
+      },
+      "SubnetIds": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    "primaryIdentifier": ["/properties/LoadBalancerArn"],
+    "readOnlyProperties": [
+      "/properties/LoadBalancerName",
+      "/properties/LoadBalancerFullName",
+      "/properties/CanonicalHostedZoneID",
+      "/properties/LoadBalancerArn",
+      "/properties/DNSName"
+    ],
+    "writeOnlyProperties": [
+      "/properties/EnableCapacityReservationProvisionStabilize"
+    ],
+    "createOnlyProperties": [
+      "/properties/Name",
+      "/properties/Type",
+      "/properties/Scheme"
+    ],
+    "additionalProperties": false,
+    "allOf": [
+      {
+        "oneOf": [
+          {
+            "required": ["Subnets"]
+          },
+          {
+            "required": ["SubnetMappings"]
+          }
+        ]
+      }
+    ],
+    "definitions": {
+      "LoadBalancerAttribute": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MinimumLoadBalancerCapacity": {
+        "additionalProperties": false,
+        "properties": {
+          "CapacityUnits": {
+            "type": "integer"
+          }
+        },
+        "required": ["CapacityUnits"],
+        "type": "object"
+      },
+      "SubnetMapping": {
+        "additionalProperties": false,
+        "properties": {
+          "AllocationId": {
+            "type": "string"
+          },
+          "IPv6Address": {
+            "type": "string"
+          },
+          "PrivateIPv4Address": {
+            "type": "string"
+          },
+          "SourceNatIpv6Prefix": {
+            "type": "string"
+          },
+          "SubnetId": {
+            "type": "string"
+          }
+        },
+        "required": ["SubnetId"],
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Key"],
+        "type": "object"
+      }
+    },
+    "properties": {
+      "CanonicalHostedZoneID": {
+        "type": "string"
+      },
+      "DNSName": {
+        "type": "string"
+      },
+      "EnableCapacityReservationProvisionStabilize": {
+        "type": "boolean"
+      },
+      "EnablePrefixForIpv6SourceNat": {
+        "enum": ["off", "on"],
+        "type": "string"
+      },
+      "EnforceSecurityGroupInboundRulesOnPrivateLinkTraffic": {
+        "type": "string"
+      },
+      "IpAddressType": {
+        "enum": ["dualstack", "dualstack-without-public-ipv4", "ipv4"],
+        "type": "string"
+      },
+      "Ipv4IpamPoolId": {
+        "type": "string"
+      },
+      "LoadBalancerArn": {
+        "type": "string"
+      },
+      "LoadBalancerAttributes": {
+        "items": {
+          "$ref": "#/definitions/LoadBalancerAttribute"
+        },
+        "type": "array"
+      },
+      "LoadBalancerFullName": {
+        "type": "string"
+      },
+      "LoadBalancerName": {
+        "type": "string"
+      },
+      "MinimumLoadBalancerCapacity": {
+        "$ref": "#/definitions/MinimumLoadBalancerCapacity",
+        "type": "object"
+      },
+      "Name": {
+        "type": "string"
+      },
+      "Scheme": {
+        "enum": ["internal", "internet-facing"],
+        "type": "string"
+      },
+      "SecurityGroups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "SubnetMappings": {
+        "items": {
+          "$ref": "#/definitions/SubnetMapping"
+        },
+        "type": "array"
+      },
+      "Subnets": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      },
+      "Type": {
+        "enum": ["application", "gateway", "network"],
+        "type": "string"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::ElasticLoadBalancingV2::Listener",
+    "required": ["LoadBalancerArn", "DefaultActions"],
+    "primaryIdentifier": ["/properties/ListenerArn"],
+    "readOnlyProperties": ["/properties/ListenerArn"],
+    "writeOnlyProperties": [
+      "/properties/DefaultActions/*/AuthenticateOidcConfig/ClientSecret"
+    ],
+    "createOnlyProperties": ["/properties/LoadBalancerArn"],
+    "additionalProperties": false,
+    "definitions": {
+      "Action": {
+        "additionalProperties": false,
+        "properties": {
+          "AuthenticateCognitoConfig": {
+            "$ref": "#/definitions/AuthenticateCognitoConfig"
+          },
+          "AuthenticateOidcConfig": {
+            "$ref": "#/definitions/AuthenticateOidcConfig"
+          },
+          "FixedResponseConfig": {
+            "$ref": "#/definitions/FixedResponseConfig"
+          },
+          "ForwardConfig": {
+            "$ref": "#/definitions/ForwardConfig"
+          },
+          "JwtValidationConfig": {
+            "$ref": "#/definitions/JwtValidationConfig"
+          },
+          "Order": {
+            "type": "integer"
+          },
+          "RedirectConfig": {
+            "$ref": "#/definitions/RedirectConfig"
+          },
+          "TargetGroupArn": {
+            "type": "string"
+          },
+          "Type": {
+            "enum": [
+              "authenticate-cognito",
+              "authenticate-oidc",
+              "fixed-response",
+              "forward",
+              "jwt-validation",
+              "redirect"
+            ],
+            "type": "string"
+          }
+        },
+        "required": ["Type"],
+        "type": "object"
+      },
+      "AuthenticateCognitoConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "AuthenticationRequestExtraParams": {
+            "patternProperties": {
+              "[a-zA-Z0-9]+": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "OnUnauthenticatedRequest": {
+            "enum": ["allow", "authenticate", "deny"],
+            "type": "string"
+          },
+          "Scope": {
+            "type": "string"
+          },
+          "SessionCookieName": {
+            "type": "string"
+          },
+          "SessionTimeout": {
+            "type": "string"
+          },
+          "UserPoolArn": {
+            "type": "string"
+          },
+          "UserPoolClientId": {
+            "anyOf": [{}, {}],
+            "type": "string"
+          },
+          "UserPoolDomain": {
+            "type": "string"
+          }
+        },
+        "required": ["UserPoolClientId", "UserPoolDomain", "UserPoolArn"],
+        "type": "object"
+      },
+      "AuthenticateOidcConfig": {
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": ["ClientSecret"]
+          },
+          {
+            "required": ["UseExistingClientSecret"]
+          }
+        ],
+        "properties": {
+          "AuthenticationRequestExtraParams": {
+            "patternProperties": {
+              "[a-zA-Z0-9]+": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "AuthorizationEndpoint": {
+            "type": "string"
+          },
+          "ClientId": {
+            "type": "string"
+          },
+          "ClientSecret": {
+            "type": "string"
+          },
+          "Issuer": {
+            "type": "string"
+          },
+          "OnUnauthenticatedRequest": {
+            "enum": ["allow", "authenticate", "deny"],
+            "type": "string"
+          },
+          "Scope": {
+            "type": "string"
+          },
+          "SessionCookieName": {
+            "type": "string"
+          },
+          "SessionTimeout": {
+            "type": "string"
+          },
+          "TokenEndpoint": {
+            "type": "string"
+          },
+          "UseExistingClientSecret": {
+            "type": "boolean"
+          },
+          "UserInfoEndpoint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "TokenEndpoint",
+          "Issuer",
+          "UserInfoEndpoint",
+          "ClientId",
+          "AuthorizationEndpoint"
+        ],
+        "type": "object"
+      },
+      "Certificate": {
+        "additionalProperties": false,
+        "properties": {
+          "CertificateArn": {
+            "anyOf": [{}, {}],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FixedResponseConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "ContentType": {
+            "type": "string"
+          },
+          "MessageBody": {
+            "type": "string"
+          },
+          "StatusCode": {
+            "type": "string"
+          }
+        },
+        "required": ["StatusCode"],
+        "type": "object"
+      },
+      "ForwardConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "TargetGroupStickinessConfig": {
+            "$ref": "#/definitions/TargetGroupStickinessConfig"
+          },
+          "TargetGroups": {
+            "items": {
+              "$ref": "#/definitions/TargetGroupTuple"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "JwtValidationActionAdditionalClaim": {
+        "additionalProperties": false,
+        "properties": {
+          "Format": {
+            "enum": ["single-string", "space-separated-values", "string-array"],
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Format", "Name", "Values"],
+        "type": "object"
+      },
+      "JwtValidationConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "AdditionalClaims": {
+            "items": {
+              "$ref": "#/definitions/JwtValidationActionAdditionalClaim"
+            },
+            "type": "array"
+          },
+          "Issuer": {
+            "type": "string"
+          },
+          "JwksEndpoint": {
+            "type": "string"
+          }
+        },
+        "required": ["JwksEndpoint", "Issuer"],
+        "type": "object"
+      },
+      "ListenerAttribute": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "MutualAuthentication": {
+        "additionalProperties": false,
+        "properties": {
+          "AdvertiseTrustStoreCaNames": {
+            "enum": ["off", "on"],
+            "type": "string"
+          },
+          "IgnoreClientCertificateExpiry": {
+            "type": "boolean"
+          },
+          "Mode": {
+            "type": "string"
+          },
+          "TrustStoreArn": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "RedirectConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "Host": {
+            "type": "string"
+          },
+          "Path": {
+            "type": "string"
+          },
+          "Port": {
+            "type": "string"
+          },
+          "Protocol": {
+            "type": "string"
+          },
+          "Query": {
+            "type": "string"
+          },
+          "StatusCode": {
+            "enum": ["HTTP_301", "HTTP_302"],
+            "type": "string"
+          }
+        },
+        "required": ["StatusCode"],
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "TargetGroupStickinessConfig": {
+        "additionalProperties": false,
+        "properties": {
+          "DurationSeconds": {
+            "type": "integer"
+          },
+          "Enabled": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "TargetGroupTuple": {
+        "additionalProperties": false,
+        "properties": {
+          "TargetGroupArn": {
+            "type": "string"
+          },
+          "Weight": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "properties": {
+      "AlpnPolicy": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Certificates": {
+        "items": {
+          "$ref": "#/definitions/Certificate"
+        },
+        "type": "array"
+      },
+      "DefaultActions": {
+        "items": {
+          "$ref": "#/definitions/Action"
+        },
+        "type": "array"
+      },
+      "ListenerArn": {
+        "type": "string"
+      },
+      "ListenerAttributes": {
+        "items": {
+          "$ref": "#/definitions/ListenerAttribute"
+        },
+        "type": "array"
+      },
+      "LoadBalancerArn": {
+        "type": "string"
+      },
+      "MutualAuthentication": {
+        "$ref": "#/definitions/MutualAuthentication"
+      },
+      "Port": {
+        "type": "integer"
+      },
+      "Protocol": {
+        "enum": [
+          "GENEVE",
+          "HTTP",
+          "HTTPS",
+          "QUIC",
+          "TCP",
+          "TCP_QUIC",
+          "TCP_UDP",
+          "TLS",
+          "UDP"
+        ],
+        "type": "string"
+      },
+      "SslPolicy": {
+        "type": "string"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    "primaryIdentifier": ["/properties/TargetGroupArn"],
+    "readOnlyProperties": [
+      "/properties/LoadBalancerArns",
+      "/properties/TargetGroupArn",
+      "/properties/TargetGroupName",
+      "/properties/TargetGroupFullName"
+    ],
+    "createOnlyProperties": [
+      "/properties/TargetType",
+      "/properties/ProtocolVersion",
+      "/properties/Port",
+      "/properties/Name",
+      "/properties/VpcId",
+      "/properties/Protocol",
+      "/properties/IpAddressType"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+      "Matcher": {
+        "additionalProperties": false,
+        "properties": {
+          "GrpcCode": {
+            "type": "string"
+          },
+          "HttpCode": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "TargetDescription": {
+        "additionalProperties": false,
+        "properties": {
+          "AvailabilityZone": {
+            "type": "string"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "Port": {
+            "type": "integer"
+          },
+          "QuicServerId": {
+            "type": "string"
+          }
+        },
+        "required": ["Id"],
+        "type": "object"
+      },
+      "TargetGroupAttribute": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "properties": {
+      "HealthCheckEnabled": {
+        "type": "boolean"
+      },
+      "HealthCheckIntervalSeconds": {
+        "type": "integer"
+      },
+      "HealthCheckPath": {
+        "type": "string"
+      },
+      "HealthCheckPort": {
+        "type": "string"
+      },
+      "HealthCheckProtocol": {
+        "enum": [
+          "GENEVE",
+          "HTTP",
+          "HTTPS",
+          "QUIC",
+          "TCP",
+          "TCP_QUIC",
+          "TCP_UDP",
+          "TLS",
+          "UDP"
+        ],
+        "type": "string"
+      },
+      "HealthCheckTimeoutSeconds": {
+        "type": "integer"
+      },
+      "HealthyThresholdCount": {
+        "type": "integer"
+      },
+      "IpAddressType": {
+        "enum": ["ipv4", "ipv6"],
+        "type": "string"
+      },
+      "LoadBalancerArns": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Matcher": {
+        "$ref": "#/definitions/Matcher"
+      },
+      "Name": {
+        "type": "string"
+      },
+      "Port": {
+        "type": "integer"
+      },
+      "Protocol": {
+        "enum": [
+          "GENEVE",
+          "HTTP",
+          "HTTPS",
+          "QUIC",
+          "TCP",
+          "TCP_QUIC",
+          "TCP_UDP",
+          "TLS",
+          "UDP"
+        ],
+        "type": "string"
+      },
+      "ProtocolVersion": {
+        "type": "string"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      },
+      "TargetControlPort": {
+        "type": "integer"
+      },
+      "TargetGroupArn": {
+        "type": "string"
+      },
+      "TargetGroupAttributes": {
+        "items": {
+          "$ref": "#/definitions/TargetGroupAttribute"
+        },
+        "type": "array"
+      },
+      "TargetGroupFullName": {
+        "type": "string"
+      },
+      "TargetGroupName": {
+        "type": "string"
+      },
+      "TargetType": {
+        "enum": ["alb", "instance", "ip", "lambda"],
+        "type": "string"
+      },
+      "Targets": {
+        "items": {
+          "$ref": "#/definitions/TargetDescription"
+        },
+        "type": "array"
+      },
+      "UnhealthyThresholdCount": {
+        "type": "integer"
+      },
+      "VpcId": {
+        "type": "string"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::IAM::Role",
+    "required": ["AssumeRolePolicyDocument"],
+    "primaryIdentifier": ["/properties/RoleName"],
+    "readOnlyProperties": ["/properties/Arn", "/properties/RoleId"],
+    "createOnlyProperties": ["/properties/Path", "/properties/RoleName"],
+    "additionalProperties": false,
+    "definitions": {
+      "Policy": {
+        "additionalProperties": false,
+        "properties": {
+          "PolicyDocument": {
+            "type": ["string", "object"]
+          },
+          "PolicyName": {
+            "type": "string"
+          }
+        },
+        "required": ["PolicyName", "PolicyDocument"],
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Key", "Value"],
+        "type": "object"
+      }
+    },
+    "properties": {
+      "Arn": {
+        "type": "string"
+      },
+      "AssumeRolePolicyDocument": {
+        "type": ["object", "string"]
+      },
+      "Description": {
+        "type": "string"
+      },
+      "ManagedPolicyArns": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "MaxSessionDuration": {
+        "type": "integer"
+      },
+      "Path": {
+        "type": "string"
+      },
+      "PermissionsBoundary": {
+        "type": "string"
+      },
+      "Policies": {
+        "items": {
+          "$ref": "#/definitions/Policy"
+        },
+        "type": "array"
+      },
+      "RoleId": {
+        "type": "string"
+      },
+      "RoleName": {
+        "type": "string"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::IAM::InstanceProfile",
+    "required": ["Roles"],
+    "primaryIdentifier": ["/properties/InstanceProfileName"],
+    "readOnlyProperties": ["/properties/Arn"],
+    "createOnlyProperties": [
+      "/properties/InstanceProfileName",
+      "/properties/Path"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "Arn": {
+        "type": "string"
+      },
+      "InstanceProfileName": {
+        "type": "string"
+      },
+      "Path": {
+        "type": "string"
+      },
+      "Roles": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::IAM::ManagedPolicy",
+    "required": ["PolicyDocument"],
+    "primaryIdentifier": ["/properties/PolicyArn"],
+    "readOnlyProperties": [
+      "/properties/PolicyArn",
+      "/properties/AttachmentCount",
+      "/properties/CreateDate",
+      "/properties/DefaultVersionId",
+      "/properties/IsAttachable",
+      "/properties/PermissionsBoundaryUsageCount",
+      "/properties/PolicyId",
+      "/properties/UpdateDate"
+    ],
+    "createOnlyProperties": [
+      "/properties/ManagedPolicyName",
+      "/properties/Description",
+      "/properties/Path"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "AttachmentCount": {
+        "type": "integer"
+      },
+      "CreateDate": {
+        "type": "string"
+      },
+      "DefaultVersionId": {
+        "type": "string"
+      },
+      "Description": {
+        "type": "string"
+      },
+      "Groups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "IsAttachable": {
+        "type": "boolean"
+      },
+      "ManagedPolicyName": {
+        "type": "string"
+      },
+      "Path": {
+        "type": "string"
+      },
+      "PermissionsBoundaryUsageCount": {
+        "type": "integer"
+      },
+      "PolicyArn": {
+        "type": "string"
+      },
+      "PolicyDocument": {},
+      "PolicyId": {
+        "type": "string"
+      },
+      "Roles": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "UpdateDate": {
+        "type": "string"
+      },
+      "Users": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::IAM::Policy",
+    "required": ["PolicyDocument", "PolicyName"],
+    "primaryIdentifier": ["/properties/Id"],
+    "readOnlyProperties": ["/properties/Id"],
+    "additionalProperties": false,
+    "anyOf": [
+      {
+        "required": ["Users"]
+      },
+      {
+        "required": ["Groups"]
+      },
+      {
+        "required": ["Roles"]
+      }
+    ],
+    "properties": {
+      "Groups": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Id": {
+        "type": "string"
+      },
+      "PolicyDocument": {
+        "type": ["object", "string"]
+      },
+      "PolicyName": {
+        "type": "string"
+      },
+      "Roles": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "Users": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::S3::Bucket",
+    "primaryIdentifier": ["/properties/BucketName"],
+    "readOnlyProperties": [
+      "/properties/Arn",
+      "/properties/DomainName",
+      "/properties/DualStackDomainName",
+      "/properties/RegionalDomainName",
+      "/properties/MetadataTableConfiguration/S3TablesDestination/TableNamespace",
+      "/properties/MetadataTableConfiguration/S3TablesDestination/TableArn",
+      "/properties/MetadataConfiguration/Destination",
+      "/properties/MetadataConfiguration/JournalTableConfiguration/TableName",
+      "/properties/MetadataConfiguration/JournalTableConfiguration/TableArn",
+      "/properties/MetadataConfiguration/InventoryTableConfiguration/TableName",
+      "/properties/MetadataConfiguration/InventoryTableConfiguration/TableArn",
+      "/properties/MetadataConfiguration/AnnotationTableConfiguration/TableName",
+      "/properties/MetadataConfiguration/AnnotationTableConfiguration/TableArn",
+      "/properties/WebsiteURL"
+    ],
+    "writeOnlyProperties": [
+      "/properties/AccessControl",
+      "/properties/BucketNamePrefix",
+      "/properties/BucketNamespace",
+      "/properties/MetadataConfiguration/JournalTableConfiguration/EncryptionConfiguration",
+      "/properties/MetadataConfiguration/InventoryTableConfiguration/EncryptionConfiguration",
+      "/properties/MetadataConfiguration/AnnotationTableConfiguration/EncryptionConfiguration",
+      "/properties/LifecycleConfiguration/Rules/*/NoncurrentVersionExpirationInDays",
+      "/properties/LifecycleConfiguration/Rules/*/NoncurrentVersionTransition",
+      "/properties/LifecycleConfiguration/Rules/*/Transition",
+      "/properties/ReplicationConfiguration/Rules/*/Prefix",
+      "/properties/LifecycleConfiguration/Rules/*/ExpiredObjectDeleteMarker"
+    ],
+    "createOnlyProperties": [
+      "/properties/BucketName",
+      "/properties/BucketNamePrefix",
+      "/properties/BucketNamespace"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+      "AbortIncompleteMultipartUpload": {
+        "additionalProperties": false,
+        "properties": {
+          "DaysAfterInitiation": {
+            "type": "integer"
+          }
+        },
+        "required": ["DaysAfterInitiation"],
+        "type": "object"
+      },
+      "AccelerateConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "AccelerationStatus": {
+            "enum": ["Enabled", "Suspended"],
+            "type": "string"
+          }
+        },
+        "required": ["AccelerationStatus"],
+        "type": "object"
+      },
+      "AccessControlTranslation": {
+        "additionalProperties": false,
+        "properties": {
+          "Owner": {
+            "enum": ["Destination"],
+            "type": "string"
+          }
+        },
+        "required": ["Owner"],
+        "type": "object"
+      },
+      "AnalyticsConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "StorageClassAnalysis": {
+            "$ref": "#/definitions/StorageClassAnalysis"
+          },
+          "TagFilters": {
+            "items": {
+              "$ref": "#/definitions/TagFilter"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["StorageClassAnalysis", "Id"],
+        "type": "object"
+      },
+      "AnnotationTableConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "ConfigurationState": {
+            "enum": ["ENABLED", "DISABLED"],
+            "type": "string"
+          },
+          "EncryptionConfiguration": {
+            "$ref": "#/definitions/MetadataTableEncryptionConfiguration"
+          },
+          "Role": {
+            "type": "string"
+          },
+          "TableArn": {
+            "type": "string"
+          },
+          "TableName": {
+            "type": "string"
+          }
+        },
+        "required": ["ConfigurationState"],
+        "type": "object"
+      },
+      "Arn": {
+        "type": "string"
+      },
+      "BlockedEncryptionTypeList": {
+        "items": {
+          "enum": ["NONE", "SSE-C"],
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "BlockedEncryptionTypes": {
+        "additionalProperties": false,
+        "properties": {
+          "EncryptionType": {
+            "$ref": "#/definitions/BlockedEncryptionTypeList"
+          }
+        },
+        "type": "object"
+      },
+      "BucketEncryption": {
+        "additionalProperties": false,
+        "properties": {
+          "ServerSideEncryptionConfiguration": {
+            "items": {
+              "$ref": "#/definitions/ServerSideEncryptionRule"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["ServerSideEncryptionConfiguration"],
+        "type": "object"
+      },
+      "CorsConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "CorsRules": {
+            "items": {
+              "$ref": "#/definitions/CorsRule"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["CorsRules"],
+        "type": "object"
+      },
+      "CorsRule": {
+        "additionalProperties": false,
+        "properties": {
+          "AllowedHeaders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "AllowedMethods": {
+            "items": {
+              "enum": ["GET", "PUT", "HEAD", "POST", "DELETE"],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "AllowedOrigins": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "ExposedHeaders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "MaxAge": {
+            "type": "integer"
+          }
+        },
+        "required": ["AllowedMethods", "AllowedOrigins"],
+        "type": "object"
+      },
+      "DataExport": {
+        "additionalProperties": false,
+        "properties": {
+          "Destination": {
+            "$ref": "#/definitions/Destination"
+          },
+          "OutputSchemaVersion": {
+            "type": "string"
+          }
+        },
+        "required": ["Destination", "OutputSchemaVersion"],
+        "type": "object"
+      },
+      "DefaultEventHold": {
+        "additionalProperties": false,
+        "properties": {
+          "Days": {
+            "type": "integer"
+          },
+          "Years": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DefaultRetention": {
+        "additionalProperties": false,
+        "properties": {
+          "Days": {
+            "type": "integer"
+          },
+          "DefaultEventHold": {
+            "$ref": "#/definitions/DefaultEventHold"
+          },
+          "Mode": {
+            "enum": ["COMPLIANCE", "GOVERNANCE"],
+            "type": "string"
+          },
+          "Years": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteMarkerReplication": {
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Destination": {
+        "additionalProperties": false,
+        "properties": {
+          "BucketAccountId": {
+            "type": "string"
+          },
+          "BucketArn": {
+            "type": "string"
+          },
+          "Format": {
+            "enum": ["CSV", "ORC", "Parquet"],
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          }
+        },
+        "required": ["BucketArn", "Format"],
+        "type": "object"
+      },
+      "EncryptionConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "ReplicaKmsKeyID": {
+            "type": "string"
+          }
+        },
+        "required": ["ReplicaKmsKeyID"],
+        "type": "object"
+      },
+      "EventBridgeConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "EventBridgeEnabled": {
+            "type": "boolean"
+          }
+        },
+        "required": ["EventBridgeEnabled"],
+        "type": "object"
+      },
+      "FilterRule": {
+        "additionalProperties": false,
+        "properties": {
+          "Name": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Name"],
+        "type": "object"
+      },
+      "IntelligentTieringConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          },
+          "TagFilters": {
+            "items": {
+              "$ref": "#/definitions/TagFilter"
+            },
+            "type": "array"
+          },
+          "Tierings": {
+            "items": {
+              "$ref": "#/definitions/Tiering"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Id", "Status", "Tierings"],
+        "type": "object"
+      },
+      "InventoryConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Destination": {
+            "$ref": "#/definitions/Destination"
+          },
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "IncludedObjectVersions": {
+            "enum": ["All", "Current"],
+            "type": "string"
+          },
+          "OptionalFields": {
+            "items": {
+              "enum": [
+                "Size",
+                "LastModifiedDate",
+                "StorageClass",
+                "ETag",
+                "IsMultipartUploaded",
+                "ReplicationStatus",
+                "EncryptionStatus",
+                "ObjectLockRetainUntilDate",
+                "ObjectLockMode",
+                "ObjectLockLegalHoldStatus",
+                "ObjectLockEventHoldStatus",
+                "ObjectLockEventHoldDuration",
+                "IntelligentTieringAccessTier",
+                "BucketKeyStatus",
+                "ChecksumAlgorithm",
+                "ObjectAccessControlList",
+                "ObjectOwner",
+                "LifecycleExpirationDate"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "ScheduleFrequency": {
+            "enum": ["Daily", "Weekly"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "Destination",
+          "Enabled",
+          "Id",
+          "IncludedObjectVersions",
+          "ScheduleFrequency"
+        ],
+        "type": "object"
+      },
+      "InventoryTableConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "ConfigurationState": {
+            "enum": ["ENABLED", "DISABLED"],
+            "type": "string"
+          },
+          "EncryptionConfiguration": {
+            "$ref": "#/definitions/MetadataTableEncryptionConfiguration"
+          },
+          "TableArn": {
+            "type": "string"
+          },
+          "TableName": {
+            "type": "string"
+          }
+        },
+        "required": ["ConfigurationState"],
+        "type": "object"
+      },
+      "JournalTableConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "EncryptionConfiguration": {
+            "$ref": "#/definitions/MetadataTableEncryptionConfiguration"
+          },
+          "RecordExpiration": {
+            "$ref": "#/definitions/RecordExpiration"
+          },
+          "TableArn": {
+            "type": "string"
+          },
+          "TableName": {
+            "type": "string"
+          }
+        },
+        "required": ["RecordExpiration"],
+        "type": "object"
+      },
+      "LambdaConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Event": {
+            "type": "string"
+          },
+          "Filter": {
+            "$ref": "#/definitions/NotificationFilter"
+          },
+          "Function": {
+            "type": "string"
+          }
+        },
+        "required": ["Function", "Event"],
+        "type": "object"
+      },
+      "LifecycleConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Rules": {
+            "items": {
+              "$ref": "#/definitions/Rule"
+            },
+            "type": "array"
+          },
+          "TransitionDefaultMinimumObjectSize": {
+            "enum": ["varies_by_storage_class", "all_storage_classes_128K"],
+            "type": "string"
+          }
+        },
+        "required": ["Rules"],
+        "type": "object"
+      },
+      "LoggingConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "DestinationBucketName": {
+            "type": "string"
+          },
+          "LogFilePrefix": {
+            "type": "string"
+          },
+          "TargetObjectKeyFormat": {
+            "$ref": "#/definitions/TargetObjectKeyFormat"
+          }
+        },
+        "type": "object"
+      },
+      "MetadataConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "AnnotationTableConfiguration": {
+            "$ref": "#/definitions/AnnotationTableConfiguration"
+          },
+          "Destination": {
+            "$ref": "#/definitions/MetadataDestination"
+          },
+          "InventoryTableConfiguration": {
+            "$ref": "#/definitions/InventoryTableConfiguration"
+          },
+          "JournalTableConfiguration": {
+            "$ref": "#/definitions/JournalTableConfiguration"
+          }
+        },
+        "required": ["JournalTableConfiguration"],
+        "type": "object"
+      },
+      "MetadataDestination": {
+        "additionalProperties": false,
+        "properties": {
+          "TableBucketArn": {
+            "type": "string"
+          },
+          "TableBucketType": {
+            "enum": ["aws", "customer"],
+            "type": "string"
+          },
+          "TableNamespace": {
+            "type": "string"
+          }
+        },
+        "required": ["TableBucketType"],
+        "type": "object"
+      },
+      "MetadataTableConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "S3TablesDestination": {
+            "$ref": "#/definitions/S3TablesDestination"
+          }
+        },
+        "required": ["S3TablesDestination"],
+        "type": "object"
+      },
+      "MetadataTableEncryptionConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "KmsKeyArn": {
+            "type": "string"
+          },
+          "SseAlgorithm": {
+            "enum": ["aws:kms", "AES256"],
+            "type": "string"
+          }
+        },
+        "required": ["SseAlgorithm"],
+        "type": "object"
+      },
+      "Metrics": {
+        "additionalProperties": false,
+        "properties": {
+          "EventThreshold": {
+            "$ref": "#/definitions/ReplicationTimeValue"
+          },
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          }
+        },
+        "required": ["Status"],
+        "type": "object"
+      },
+      "MetricsConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "AccessPointArn": {
+            "type": "string"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "TagFilters": {
+            "items": {
+              "$ref": "#/definitions/TagFilter"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Id"],
+        "type": "object"
+      },
+      "NoncurrentVersionExpiration": {
+        "additionalProperties": false,
+        "properties": {
+          "NewerNoncurrentVersions": {
+            "type": "integer"
+          },
+          "NoncurrentDays": {
+            "type": "integer"
+          }
+        },
+        "required": ["NoncurrentDays"],
+        "type": "object"
+      },
+      "NoncurrentVersionTransition": {
+        "additionalProperties": false,
+        "properties": {
+          "NewerNoncurrentVersions": {
+            "type": "integer"
+          },
+          "StorageClass": {
+            "enum": [
+              "DEEP_ARCHIVE",
+              "GLACIER",
+              "Glacier",
+              "GLACIER_IR",
+              "INTELLIGENT_TIERING",
+              "ONEZONE_IA",
+              "STANDARD_IA"
+            ],
+            "type": "string"
+          },
+          "TransitionInDays": {
+            "type": "integer"
+          }
+        },
+        "required": ["StorageClass", "TransitionInDays"],
+        "type": "object"
+      },
+      "NotificationConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "EventBridgeConfiguration": {
+            "$ref": "#/definitions/EventBridgeConfiguration"
+          },
+          "LambdaConfigurations": {
+            "items": {
+              "$ref": "#/definitions/LambdaConfiguration"
+            },
+            "type": "array"
+          },
+          "QueueConfigurations": {
+            "items": {
+              "$ref": "#/definitions/QueueConfiguration"
+            },
+            "type": "array"
+          },
+          "TopicConfigurations": {
+            "items": {
+              "$ref": "#/definitions/TopicConfiguration"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "NotificationFilter": {
+        "additionalProperties": false,
+        "properties": {
+          "S3Key": {
+            "$ref": "#/definitions/S3KeyFilter"
+          }
+        },
+        "required": ["S3Key"],
+        "type": "object"
+      },
+      "ObjectLockConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "ObjectLockEnabled": {
+            "enum": ["Enabled"],
+            "type": "string"
+          },
+          "Rule": {
+            "$ref": "#/definitions/ObjectLockRule"
+          }
+        },
+        "type": "object"
+      },
+      "ObjectLockRule": {
+        "additionalProperties": false,
+        "properties": {
+          "DefaultRetention": {
+            "$ref": "#/definitions/DefaultRetention"
+          }
+        },
+        "type": "object"
+      },
+      "OwnershipControls": {
+        "additionalProperties": false,
+        "properties": {
+          "Rules": {
+            "items": {
+              "$ref": "#/definitions/OwnershipControlsRule"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Rules"],
+        "type": "object"
+      },
+      "OwnershipControlsRule": {
+        "additionalProperties": false,
+        "properties": {
+          "ObjectOwnership": {
+            "enum": [
+              "ObjectWriter",
+              "BucketOwnerPreferred",
+              "BucketOwnerEnforced"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PartitionedPrefix": {
+        "additionalProperties": false,
+        "properties": {
+          "PartitionDateSource": {
+            "enum": ["EventTime", "DeliveryTime"],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PublicAccessBlockConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "BlockPublicAcls": {
+            "type": "boolean"
+          },
+          "BlockPublicPolicy": {
+            "type": "boolean"
+          },
+          "IgnorePublicAcls": {
+            "type": "boolean"
+          },
+          "RestrictPublicBuckets": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "QueueConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Event": {
+            "type": "string"
+          },
+          "Filter": {
+            "$ref": "#/definitions/NotificationFilter"
+          },
+          "Queue": {
+            "type": "string"
+          }
+        },
+        "required": ["Event", "Queue"],
+        "type": "object"
+      },
+      "RecordExpiration": {
+        "additionalProperties": false,
+        "properties": {
+          "Days": {
+            "type": "integer"
+          },
+          "Expiration": {
+            "enum": ["ENABLED", "DISABLED"],
+            "type": "string"
+          }
+        },
+        "required": ["Expiration"],
+        "type": "object"
+      },
+      "RedirectAllRequestsTo": {
+        "additionalProperties": false,
+        "allOf": [{}],
+        "properties": {
+          "HostName": {
+            "type": "string"
+          },
+          "Protocol": {
+            "enum": ["http", "https"],
+            "type": "string"
+          }
+        },
+        "required": ["HostName"],
+        "type": "object"
+      },
+      "RedirectRule": {
+        "additionalProperties": false,
+        "properties": {
+          "HostName": {
+            "type": "string"
+          },
+          "HttpRedirectCode": {
+            "type": "string"
+          },
+          "Protocol": {
+            "enum": ["http", "https"],
+            "type": "string"
+          },
+          "ReplaceKeyPrefixWith": {
+            "type": "string"
+          },
+          "ReplaceKeyWith": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ReplicaModifications": {
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "enum": ["Enabled", "Disabled"],
+            "type": "string"
+          }
+        },
+        "required": ["Status"],
+        "type": "object"
+      },
+      "ReplicationConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Role": {
+            "type": "string"
+          },
+          "Rules": {
+            "items": {
+              "$ref": "#/definitions/ReplicationRule"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Role", "Rules"],
+        "type": "object"
+      },
+      "ReplicationDestination": {
+        "additionalProperties": false,
+        "properties": {
+          "AccessControlTranslation": {
+            "$ref": "#/definitions/AccessControlTranslation"
+          },
+          "Account": {
+            "type": "string"
+          },
+          "Bucket": {
+            "type": "string"
+          },
+          "EncryptionConfiguration": {
+            "$ref": "#/definitions/EncryptionConfiguration"
+          },
+          "Metrics": {
+            "$ref": "#/definitions/Metrics"
+          },
+          "ReplicationTime": {
+            "$ref": "#/definitions/ReplicationTime"
+          },
+          "StorageClass": {
+            "enum": [
+              "DEEP_ARCHIVE",
+              "GLACIER",
+              "GLACIER_IR",
+              "INTELLIGENT_TIERING",
+              "ONEZONE_IA",
+              "REDUCED_REDUNDANCY",
+              "STANDARD",
+              "STANDARD_IA"
+            ],
+            "type": "string"
+          }
+        },
+        "required": ["Bucket"],
+        "type": "object"
+      },
+      "ReplicationRule": {
+        "additionalProperties": false,
+        "properties": {
+          "DeleteMarkerReplication": {
+            "$ref": "#/definitions/DeleteMarkerReplication"
+          },
+          "Destination": {
+            "$ref": "#/definitions/ReplicationDestination"
+          },
+          "Filter": {
+            "$ref": "#/definitions/ReplicationRuleFilter"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "Priority": {
+            "type": "integer"
+          },
+          "SourceSelectionCriteria": {
+            "$ref": "#/definitions/SourceSelectionCriteria"
+          },
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          }
+        },
+        "required": ["Destination", "Status"],
+        "type": "object"
+      },
+      "ReplicationRuleAndOperator": {
+        "additionalProperties": false,
+        "properties": {
+          "Prefix": {
+            "type": "string"
+          },
+          "TagFilters": {
+            "items": {
+              "$ref": "#/definitions/TagFilter"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "ReplicationRuleFilter": {
+        "additionalProperties": false,
+        "properties": {
+          "And": {
+            "$ref": "#/definitions/ReplicationRuleAndOperator"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "TagFilter": {
+            "$ref": "#/definitions/TagFilter"
+          }
+        },
+        "type": "object"
+      },
+      "ReplicationTime": {
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          },
+          "Time": {
+            "$ref": "#/definitions/ReplicationTimeValue"
+          }
+        },
+        "required": ["Status", "Time"],
+        "type": "object"
+      },
+      "ReplicationTimeValue": {
+        "additionalProperties": false,
+        "properties": {
+          "Minutes": {
+            "type": "integer"
+          }
+        },
+        "required": ["Minutes"],
+        "type": "object"
+      },
+      "RoutingRule": {
+        "additionalProperties": false,
+        "properties": {
+          "RedirectRule": {
+            "$ref": "#/definitions/RedirectRule"
+          },
+          "RoutingRuleCondition": {
+            "$ref": "#/definitions/RoutingRuleCondition"
+          }
+        },
+        "required": ["RedirectRule"],
+        "type": "object"
+      },
+      "RoutingRuleCondition": {
+        "additionalProperties": false,
+        "anyOf": [
+          {
+            "required": ["HttpErrorCodeReturnedEquals"]
+          },
+          {
+            "required": ["KeyPrefixEquals"]
+          }
+        ],
+        "properties": {
+          "HttpErrorCodeReturnedEquals": {
+            "type": "string"
+          },
+          "KeyPrefixEquals": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Rule": {
+        "additionalProperties": false,
+        "allOf": [{}],
+        "properties": {
+          "AbortIncompleteMultipartUpload": {
+            "$ref": "#/definitions/AbortIncompleteMultipartUpload"
+          },
+          "ExpirationDate": {
+            "$ref": "#/definitions/iso8601UTC"
+          },
+          "ExpirationInDays": {
+            "type": "integer"
+          },
+          "ExpiredObjectDeleteMarker": {
+            "type": "boolean"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "NoncurrentVersionExpiration": {
+            "$ref": "#/definitions/NoncurrentVersionExpiration"
+          },
+          "NoncurrentVersionExpirationInDays": {
+            "type": "integer"
+          },
+          "NoncurrentVersionTransition": {
+            "$ref": "#/definitions/NoncurrentVersionTransition"
+          },
+          "NoncurrentVersionTransitions": {
+            "items": {
+              "$ref": "#/definitions/NoncurrentVersionTransition"
+            },
+            "type": "array"
+          },
+          "ObjectSizeGreaterThan": {
+            "type": "string"
+          },
+          "ObjectSizeLessThan": {
+            "type": "string"
+          },
+          "Prefix": {
+            "type": "string"
+          },
+          "Status": {
+            "enum": ["Enabled", "Disabled"],
+            "type": "string"
+          },
+          "TagFilters": {
+            "items": {
+              "$ref": "#/definitions/TagFilter"
+            },
+            "type": "array"
+          },
+          "Transition": {
+            "$ref": "#/definitions/Transition"
+          },
+          "Transitions": {
+            "items": {
+              "$ref": "#/definitions/Transition"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Status"],
+        "type": "object"
+      },
+      "S3KeyFilter": {
+        "additionalProperties": false,
+        "properties": {
+          "Rules": {
+            "items": {
+              "$ref": "#/definitions/FilterRule"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["Rules"],
+        "type": "object"
+      },
+      "S3TablesDestination": {
+        "additionalProperties": false,
+        "properties": {
+          "TableArn": {
+            "type": "string"
+          },
+          "TableBucketArn": {
+            "type": "string"
+          },
+          "TableName": {
+            "type": "string"
+          },
+          "TableNamespace": {
+            "type": "string"
+          }
+        },
+        "required": ["TableBucketArn", "TableName"],
+        "type": "object"
+      },
+      "ServerSideEncryptionByDefault": {
+        "additionalProperties": false,
+        "properties": {
+          "KMSMasterKeyID": {
+            "anyOf": [{}, {}, {}],
+            "type": "string"
+          },
+          "SSEAlgorithm": {
+            "enum": ["aws:kms", "AES256", "aws:kms:dsse"],
+            "type": "string"
+          }
+        },
+        "required": ["SSEAlgorithm"],
+        "type": "object"
+      },
+      "ServerSideEncryptionRule": {
+        "additionalProperties": false,
+        "properties": {
+          "BlockedEncryptionTypes": {
+            "$ref": "#/definitions/BlockedEncryptionTypes"
+          },
+          "BucketKeyEnabled": {
+            "type": "boolean"
+          },
+          "ServerSideEncryptionByDefault": {
+            "$ref": "#/definitions/ServerSideEncryptionByDefault"
+          }
+        },
+        "type": "object"
+      },
+      "SourceSelectionCriteria": {
+        "additionalProperties": false,
+        "properties": {
+          "ReplicaModifications": {
+            "$ref": "#/definitions/ReplicaModifications"
+          },
+          "SseKmsEncryptedObjects": {
+            "$ref": "#/definitions/SseKmsEncryptedObjects"
+          }
+        },
+        "type": "object"
+      },
+      "SseKmsEncryptedObjects": {
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "enum": ["Disabled", "Enabled"],
+            "type": "string"
+          }
+        },
+        "required": ["Status"],
+        "type": "object"
+      },
+      "StorageClassAnalysis": {
+        "additionalProperties": false,
+        "properties": {
+          "DataExport": {
+            "$ref": "#/definitions/DataExport"
+          }
+        },
+        "type": "object"
+      },
+      "Tag": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "TagFilter": {
+        "additionalProperties": false,
+        "properties": {
+          "Key": {
+            "type": "string"
+          },
+          "Value": {
+            "type": "string"
+          }
+        },
+        "required": ["Value", "Key"],
+        "type": "object"
+      },
+      "TargetObjectKeyFormat": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "SimplePrefix": {
+                "additionalProperties": false,
+                "type": "object"
+              }
+            },
+            "required": ["SimplePrefix"]
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "PartitionedPrefix": {
+                "$ref": "#/definitions/PartitionedPrefix"
+              }
+            },
+            "required": ["PartitionedPrefix"]
+          }
+        ],
+        "type": "object"
+      },
+      "Tiering": {
+        "additionalProperties": false,
+        "properties": {
+          "AccessTier": {
+            "enum": ["ARCHIVE_ACCESS", "DEEP_ARCHIVE_ACCESS"],
+            "type": "string"
+          },
+          "Days": {
+            "type": "integer"
+          }
+        },
+        "required": ["AccessTier", "Days"],
+        "type": "object"
+      },
+      "TopicConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Event": {
+            "type": "string"
+          },
+          "Filter": {
+            "$ref": "#/definitions/NotificationFilter"
+          },
+          "Topic": {
+            "type": "string"
+          }
+        },
+        "required": ["Event", "Topic"],
+        "type": "object"
+      },
+      "Transition": {
+        "additionalProperties": false,
+        "properties": {
+          "StorageClass": {
+            "enum": [
+              "DEEP_ARCHIVE",
+              "GLACIER",
+              "Glacier",
+              "GLACIER_IR",
+              "INTELLIGENT_TIERING",
+              "ONEZONE_IA",
+              "STANDARD_IA"
+            ],
+            "type": "string"
+          },
+          "TransitionDate": {
+            "$ref": "#/definitions/iso8601UTC"
+          },
+          "TransitionInDays": {
+            "type": "integer"
+          }
+        },
+        "required": ["StorageClass"],
+        "type": "object"
+      },
+      "VersioningConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "Status": {
+            "enum": ["Enabled", "Suspended"],
+            "type": "string"
+          }
+        },
+        "required": ["Status"],
+        "type": "object"
+      },
+      "WebsiteConfiguration": {
+        "additionalProperties": false,
+        "properties": {
+          "ErrorDocument": {
+            "type": "string"
+          },
+          "IndexDocument": {
+            "type": "string"
+          },
+          "RedirectAllRequestsTo": {
+            "$ref": "#/definitions/RedirectAllRequestsTo"
+          },
+          "RoutingRules": {
+            "items": {
+              "$ref": "#/definitions/RoutingRule"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "iso8601UTC": {
+        "type": "string"
+      }
+    },
+    "properties": {
+      "AbacStatus": {
+        "enum": ["Enabled", "Disabled"],
+        "type": "string"
+      },
+      "AccelerateConfiguration": {
+        "$ref": "#/definitions/AccelerateConfiguration"
+      },
+      "AccessControl": {
+        "enum": [
+          "AuthenticatedRead",
+          "AwsExecRead",
+          "BucketOwnerFullControl",
+          "BucketOwnerRead",
+          "LogDeliveryWrite",
+          "Private",
+          "PublicRead",
+          "PublicReadWrite"
+        ],
+        "type": "string"
+      },
+      "AnalyticsConfigurations": {
+        "items": {
+          "$ref": "#/definitions/AnalyticsConfiguration"
+        },
+        "type": "array"
+      },
+      "Arn": {
+        "$ref": "#/definitions/Arn"
+      },
+      "BucketEncryption": {
+        "$ref": "#/definitions/BucketEncryption"
+      },
+      "BucketName": {
+        "type": "string"
+      },
+      "BucketNamePrefix": {
+        "type": "string"
+      },
+      "BucketNamespace": {
+        "enum": ["global", "account-regional"],
+        "type": "string"
+      },
+      "CorsConfiguration": {
+        "$ref": "#/definitions/CorsConfiguration"
+      },
+      "DomainName": {
+        "type": "string"
+      },
+      "DualStackDomainName": {
+        "type": "string"
+      },
+      "IntelligentTieringConfigurations": {
+        "items": {
+          "$ref": "#/definitions/IntelligentTieringConfiguration"
+        },
+        "type": "array"
+      },
+      "InventoryConfigurations": {
+        "items": {
+          "$ref": "#/definitions/InventoryConfiguration"
+        },
+        "type": "array"
+      },
+      "LifecycleConfiguration": {
+        "$ref": "#/definitions/LifecycleConfiguration"
+      },
+      "LoggingConfiguration": {
+        "$ref": "#/definitions/LoggingConfiguration"
+      },
+      "MetadataConfiguration": {
+        "$ref": "#/definitions/MetadataConfiguration"
+      },
+      "MetadataTableConfiguration": {
+        "$ref": "#/definitions/MetadataTableConfiguration"
+      },
+      "MetricsConfigurations": {
+        "items": {
+          "$ref": "#/definitions/MetricsConfiguration"
+        },
+        "type": "array"
+      },
+      "NotificationConfiguration": {
+        "$ref": "#/definitions/NotificationConfiguration"
+      },
+      "ObjectLockConfiguration": {
+        "$ref": "#/definitions/ObjectLockConfiguration"
+      },
+      "ObjectLockEnabled": {
+        "type": "boolean"
+      },
+      "OwnershipControls": {
+        "$ref": "#/definitions/OwnershipControls"
+      },
+      "PublicAccessBlockConfiguration": {
+        "$ref": "#/definitions/PublicAccessBlockConfiguration"
+      },
+      "RegionalDomainName": {
+        "type": "string"
+      },
+      "ReplicationConfiguration": {
+        "$ref": "#/definitions/ReplicationConfiguration"
+      },
+      "Tags": {
+        "items": {
+          "$ref": "#/definitions/Tag"
+        },
+        "type": "array"
+      },
+      "VersioningConfiguration": {
+        "$ref": "#/definitions/VersioningConfiguration"
+      },
+      "WebsiteConfiguration": {
+        "$ref": "#/definitions/WebsiteConfiguration"
+      },
+      "WebsiteURL": {
+        "type": "string"
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  },
+  {
+    "typeName": "AWS::S3::BucketPolicy",
+    "required": ["Bucket", "PolicyDocument"],
+    "primaryIdentifier": ["/properties/Bucket"],
+    "createOnlyProperties": ["/properties/Bucket"],
+    "additionalProperties": false,
+    "properties": {
+      "Bucket": {
+        "type": "string"
+      },
+      "PolicyDocument": {
+        "type": ["object", "string"]
+      }
+    },
+    "sourceUrl": "https://github.com/aws-cloudformation/resource-provider-enhanced-schemas",
+    "sourceArchiveSha256": "40fd18d258306aa2b17ff30a7ae3ade66dd75b22cfe936996836054aba03d187"
+  }
+]

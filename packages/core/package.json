@@ -1,0 +1,41 @@
+{
+  "name": "@cdk-excavator/core",
+  "version": "0.1.0",
+  "description": "Core scan, scope, normalize, generate, and report engine for cdk-excavator.",
+  "private": true,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MareTecreate/cdk-excavator.git",
+    "directory": "packages/core"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node ../../tools/clean-path.mjs dist tsconfig.tsbuildinfo && tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@cdk-excavator/i18n": "workspace:*",
+    "@aws-sdk/client-cloudcontrol": "^3.1079.0",
+    "@aws-sdk/client-cloudformation": "^3.1079.0",
+    "@aws-sdk/client-ec2": "^3.1079.0",
+    "@aws-sdk/credential-provider-ini": "3.972.60",
+    "aws-cdk-lib": "2.263.0",
+    "cdk-from-cfn": "0.312.0",
+    "constructs": "10.6.0",
+    "zod": "^3.25.67"
+  }
+}

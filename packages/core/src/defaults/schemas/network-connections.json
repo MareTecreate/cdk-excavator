@@ -1,0 +1,55 @@
+[
+  {
+    "typeName": "AWS::EC2::Route",
+    "sourceUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ec2-route.html",
+    "description": "Curated writable-property projection from the CloudFormation template reference, not a complete Resource Provider Schema. Import identifiers require review.",
+    "properties": {
+      "RouteTableId": { "type": "string" },
+      "DestinationCidrBlock": { "type": "string" },
+      "DestinationIpv6CidrBlock": { "type": "string" },
+      "DestinationPrefixListId": { "type": "string" },
+      "CarrierGatewayId": { "type": "string" },
+      "CoreNetworkArn": { "type": "string" },
+      "EgressOnlyInternetGatewayId": { "type": "string" },
+      "GatewayId": { "type": "string" },
+      "InstanceId": { "type": "string" },
+      "LocalGatewayId": { "type": "string" },
+      "NatGatewayId": { "type": "string" },
+      "NetworkInterfaceId": { "type": "string" },
+      "OdbNetworkArn": { "type": "string" },
+      "TransitGatewayId": { "type": "string" },
+      "VpcEndpointId": { "type": "string" },
+      "VpcPeeringConnectionId": { "type": "string" }
+    },
+    "required": ["RouteTableId"],
+    "createOnlyProperties": [
+      "/properties/RouteTableId",
+      "/properties/DestinationCidrBlock",
+      "/properties/DestinationIpv6CidrBlock",
+      "/properties/DestinationPrefixListId"
+    ]
+  },
+  {
+    "typeName": "AWS::EC2::SubnetRouteTableAssociation",
+    "sourceUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ec2-subnetroutetableassociation.html",
+    "description": "Curated writable-property projection; import identifiers require review.",
+    "properties": {
+      "RouteTableId": { "type": "string" },
+      "SubnetId": { "type": "string" }
+    },
+    "required": ["RouteTableId", "SubnetId"],
+    "createOnlyProperties": ["/properties/RouteTableId", "/properties/SubnetId"]
+  },
+  {
+    "typeName": "AWS::EC2::VPCGatewayAttachment",
+    "sourceUrl": "https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-ec2-vpcgatewayattachment.html",
+    "description": "Curated writable-property projection; import identifiers require review.",
+    "properties": {
+      "VpcId": { "type": "string" },
+      "InternetGatewayId": { "type": "string" },
+      "VpnGatewayId": { "type": "string" }
+    },
+    "required": ["VpcId"],
+    "createOnlyProperties": ["/properties/VpcId"]
+  }
+]

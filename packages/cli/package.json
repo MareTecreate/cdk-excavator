@@ -1,0 +1,54 @@
+{
+  "name": "cdk-excavator",
+  "version": "0.1.0",
+  "description": "Review-first CLI that excavates existing AWS resources into AWS CDK drafts and gap reports.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MareTecreate/cdk-excavator.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/MareTecreate/cdk-excavator#readme",
+  "bugs": "https://github.com/MareTecreate/cdk-excavator/issues",
+  "keywords": [
+    "aws",
+    "aws-cdk",
+    "cloudformation",
+    "iac",
+    "infrastructure-as-code"
+  ],
+  "engines": {
+    "node": "^20.17.0 || ^22.13.0 || >=23.5.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "bin": {
+    "cdkx": "./bin/cdkx.mjs"
+  },
+  "main": "./dist/cli.js",
+  "files": [
+    "bin",
+    "dist",
+    "LICENSE",
+    "README.md",
+    "THIRD_PARTY_NOTICES.txt"
+  ],
+  "scripts": {
+    "build": "node ../../tools/build-cli.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudcontrol": "^3.1079.0",
+    "@aws-sdk/client-cloudformation": "^3.1079.0",
+    "@aws-sdk/client-ec2": "^3.1079.0",
+    "@aws-sdk/credential-provider-ini": "3.972.60",
+    "@inquirer/prompts": "^8.5.2",
+    "aws-cdk-lib": "2.263.0",
+    "cdk-from-cfn": "0.312.0",
+    "constructs": "10.6.0",
+    "jmespath": "0.16.0",
+    "zod": "^3.25.67"
+  }
+}

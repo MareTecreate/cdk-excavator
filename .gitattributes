@@ -1,0 +1,2 @@
+# Keep generated notices and source checks identical across checkout platforms.
+* text=auto eol=lf

@@ -1,0 +1,23 @@
+{
+  "name": "cdk-excavator-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --sort run build && pnpm typecheck",
+    "typecheck": "tsc -p packages/cli/tsconfig.build.json --noEmit"
+  },
+  "devDependencies": {
+    "@cdk-excavator/core": "workspace:*",
+    "@cdk-excavator/i18n": "workspace:*",
+    "@types/jmespath": "0.15.2",
+    "@types/node": "^24.0.10",
+    "cdk-excavator": "workspace:*",
+    "esbuild": "0.28.1",
+    "typescript": "^5.8.3"
+  }
+}

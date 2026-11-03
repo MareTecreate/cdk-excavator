@@ -67,8 +67,8 @@ importers:
         specifier: 0.16.0
         version: 0.16.0
       zod:
-        specifier: ^3.25.67
-        version: 3.25.76
+        specifier: ^4.6.6
+        version: 4.6.6
 
   packages/core:
     dependencies:
@@ -97,8 +97,8 @@ importers:
         specifier: 10.6.0
         version: 10.6.0
       zod:
-        specifier: ^3.25.67
-        version: 3.25.76
+        specifier: ^4.6.6
+        version: 4.6.6
 
   packages/i18n: {}
 
@@ -486,6 +486,7 @@ packages:
   '@smithy/core@3.29.1':
     resolution: {integrity: sha512-qoiY4nrk5OCu1+eIR1VB8l5DmON/oKiqrd5zZFAhXJXjJlLWQusKEW/SkBDAtGDcPaz86m9kfcE1lngU0GlM6A==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.4.6':
     resolution: {integrity: sha512-B2WQ/PV/H6Jeg3lrIq6bKUfa6Hy01mtK7CGs6lhjzHA6k4aagldH6T6eEjnzKl4HI0cJnAsxfJ19pgb5PV+CVQ==}
@@ -601,8 +602,8 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
@@ -1105,4 +1106,4 @@ snapshots:
 
   undici-types@7.18.2: {}
 
-  zod@3.25.76: {}
+  zod@4.6.6: {}

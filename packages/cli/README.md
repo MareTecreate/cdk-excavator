@@ -16,6 +16,8 @@ It uses the standard AWS SDK credential chain and does not accept, store, or tra
 
 Japanese and complete usage documentation is available in the [GitHub repository](https://github.com/MareTecreate/cdk-excavator).
 
+JSON safety limits: 32 MiB per input file (and in total per schema/rule directory), 1,000,000 nodes, 50,000 entries per array/object, and nesting depth 64. Oversized input is rejected without truncation; split scans by region/resource type when needed. These limits bound validation, not total process memory. Validation stops at the first invalid collection member and may report only a subset of issues.
+
 ## 日本語
 
 `cdk-excavator` は、既存AWS環境を読み取り専用で調査し、レビュー前提のAWS CDK下書きとギャップレポートを作るCLIです。インストールされるコマンドは `cdkx` です。
@@ -26,6 +28,8 @@ Node.jsの対応範囲は `^20.17.0 || ^22.13.0 || >=23.5.0`。通常はサポ�
 > npmの `cdkx` パッケージ名は別製品が使用しています。`npx cdkx` を実行せず、必ず `npx --package cdk-excavator cdkx` を使ってください。
 
 AWS SDK標準認証チェーンを使い、アクセスキーを独自に受け付け・保存・送信しません。生成コードを適用する前に、すべての `TODO(GAP-n)`、import mapping、置換リスク、状態を持つリソースを確認してください。
+
+JSON入力の安全上限は、1ファイル32MiB（schema/ruleディレクトリは合計も同じ）、100万要素、配列・オブジェクトごと5万件、深さ64です。超過時は切り捨てずにエラーとします。必要に応じてリージョン・リソース種別で調査を分割してください。これは検証の上限であり、プロセス全体のメモリ上限ではありません。コレクションの検証は最初の不正要素で止まるため、報告は全エラーを網羅しない場合があります。
 
 ## License
 

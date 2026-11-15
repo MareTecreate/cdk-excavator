@@ -1,6 +1,6 @@
 {
   "name": "@cdk-excavator/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core scan, scope, normalize, generate, and report engine for cdk-excavator.",
   "private": true,
   "license": "Apache-2.0",
@@ -36,6 +36,6 @@
     "aws-cdk-lib": "2.263.0",
     "cdk-from-cfn": "0.312.0",
     "constructs": "10.6.0",
-    "zod": "^3.25.67"
+    "zod": "4.6.7"
   }
 }

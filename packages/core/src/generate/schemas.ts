@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  boundedArray,
+  boundedJson,
+  boundedRecord,
+} from "../model/bounded-schema.js";
 
 import { TOOL_SCHEMA_VERSION } from "../model/schemas.js";
 import { ExternalReferenceSchema } from "../scope/schemas.js";
@@ -13,10 +18,10 @@ export const GenerationStackSchema = z
       .optional(),
     region: z.string().min(1).optional(),
     kind: z.enum(["vpc", "regional", "global", "unresolved"]),
-    vpcIds: z.array(z.string()),
-    availabilityZones: z.array(z.string()),
-    resourceKeys: z.array(z.string()),
-    reviewReasons: z.array(z.string()),
+    vpcIds: boundedArray(z.string()),
+    availabilityZones: boundedArray(z.string()),
+    resourceKeys: boundedArray(z.string()),
+    reviewReasons: boundedArray(z.string()),
   })
   .strict();
 
@@ -45,15 +50,17 @@ export const GenerationReferenceSchema = z
   })
   .strict();
 
-export const GenerationPlanSchema = z
-  .object({
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    maxResourcesPerStack: z.number().int().positive().max(500),
-    stacks: z.array(GenerationStackSchema),
-    references: z.array(GenerationReferenceSchema),
-    warnings: z.array(z.string()),
-  })
-  .strict();
+export const GenerationPlanSchema = boundedJson(
+  z
+    .object({
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      maxResourcesPerStack: z.number().int().positive().max(500),
+      stacks: boundedArray(GenerationStackSchema),
+      references: boundedArray(GenerationReferenceSchema),
+      warnings: boundedArray(z.string()),
+    })
+    .strict(),
+);
 
 export const GeneratedCfnResourceSchema = z
   .object({
@@ -62,16 +69,16 @@ export const GeneratedCfnResourceSchema = z
       .object({
         "cdk-excavator": z
           .object({
-            gapCodes: z.array(z.string().min(1)).default([]),
+            gapCodes: boundedArray(z.string().min(1)).default([]),
             identifier: z.string().min(1),
             resourceKey: z.string().min(1),
-            referenceNotes: z.array(z.string()).optional(),
+            referenceNotes: boundedArray(z.string()).optional(),
           })
           .strict(),
       })
       .strict(),
-    Properties: z.record(z.unknown()).default({}),
-    DependsOn: z.array(z.string()).optional(),
+    Properties: boundedRecord(z.string(), z.unknown()).default({}),
+    DependsOn: boundedArray(z.string()).optional(),
     Type: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
     UpdateReplacePolicy: z.literal("Retain"),
   })
@@ -85,24 +92,28 @@ export const GeneratedCfnParameterSchema = z
   })
   .strict();
 
-export const GeneratedCfnTemplateSchema = z
-  .object({
-    AWSTemplateFormatVersion: z.literal("2010-09-09"),
-    Description: z.string().min(1),
-    Parameters: z.record(GeneratedCfnParameterSchema).optional(),
-    Outputs: z
-      .record(
+export const GeneratedCfnTemplateSchema = boundedJson(
+  z
+    .object({
+      AWSTemplateFormatVersion: z.literal("2010-09-09"),
+      Description: z.string().min(1),
+      Parameters: boundedRecord(
+        z.string(),
+        GeneratedCfnParameterSchema,
+      ).optional(),
+      Outputs: boundedRecord(
+        z.string(),
         z
           .object({
-            Value: z.unknown(),
+            Value: z.unknown().optional(),
             Export: z.object({ Name: z.string() }).strict(),
           })
           .strict(),
-      )
-      .optional(),
-    Resources: z.record(GeneratedCfnResourceSchema),
-  })
-  .strict();
+      ).optional(),
+      Resources: boundedRecord(z.string(), GeneratedCfnResourceSchema),
+    })
+    .strict(),
+);
 
 export const ImportStatusSchema = z.enum(["blocked", "needs-review", "ready"]);
 
@@ -118,29 +129,35 @@ export const ImportMapResourceSchema = z
       .optional(),
     cdkPath: z.string().min(1),
     identifier: z.string().min(1),
-    importIdentifiers: z.record(z.string().min(1)),
+    importIdentifiers: boundedRecord(z.string(), z.string().min(1)),
     logicalId: z.string().min(1),
     region: z.string().min(1),
     resourceKey: z.string().min(1),
     resourceType: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
-    reviewReasons: z.array(z.string().min(1)).default([]),
+    reviewReasons: boundedArray(z.string().min(1)).default([]),
     status: ImportStatusSchema,
     stackName: z.string().optional(),
   })
   .strict();
 
-export const CdkImportMapDocumentSchema = z
-  .object({
-    externalReferences: z.array(ImportBoundaryReferenceSchema).default([]),
-    resources: z.array(ImportMapResourceSchema),
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    stackName: z.string().min(1),
-    toolVersion: z.string().min(1),
-    plan: GenerationPlanSchema.optional(),
-  })
-  .strict();
+export const CdkImportMapDocumentSchema = boundedJson(
+  z
+    .object({
+      externalReferences: boundedArray(ImportBoundaryReferenceSchema).default(
+        [],
+      ),
+      resources: boundedArray(ImportMapResourceSchema),
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      stackName: z.string().min(1),
+      toolVersion: z.string().min(1),
+      plan: GenerationPlanSchema.optional(),
+    })
+    .strict(),
+);
 
-export const CdkResourceMappingSchema = z.record(z.record(z.string().min(1)));
+export const CdkResourceMappingSchema = boundedJson(
+  boundedRecord(z.string(), boundedRecord(z.string(), z.string().min(1))),
+);
 
 export type CdkImportMapDocument = z.infer<typeof CdkImportMapDocumentSchema>;
 export type CdkResourceMapping = z.infer<typeof CdkResourceMappingSchema>;

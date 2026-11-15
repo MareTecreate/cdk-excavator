@@ -10,6 +10,7 @@ import {
 
 import { mapWithConcurrency } from "./concurrency.js";
 import type { ScanError } from "../model/schemas.js";
+import { parseJsonInput } from "../model/input-limits.js";
 import { paginateByToken } from "./pagination.js";
 import {
   isRetryableError,
@@ -196,7 +197,7 @@ function parseResourceProperties(properties?: string): Record<string, unknown> {
     return {};
   }
 
-  const parsed = JSON.parse(properties) as unknown;
+  const parsed = parseJsonInput(properties);
 
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     throw new Error("Cloud Control resource properties must be a JSON object");

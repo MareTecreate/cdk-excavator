@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { parseJsonInput } from "../model/input-limits.js";
 
 import {
   CloudFormationClient,
@@ -46,9 +47,7 @@ export class AwsResourceSchemaProvider implements ResourceSchemaProvider {
       throw new Error(`CloudFormation returned no schema for ${resourceType}.`);
     }
 
-    const schema = CfnResourceSchemaSchema.parse(
-      JSON.parse(output.Schema) as unknown,
-    );
+    const schema = CfnResourceSchemaSchema.parse(parseJsonInput(output.Schema));
     if (schema.typeName !== resourceType)
       throw new Error(
         "Returned schema does not match the requested resource type.",

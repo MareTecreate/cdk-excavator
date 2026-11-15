@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  boundedArray,
+  boundedJson,
+  boundedRecord,
+} from "../model/bounded-schema.js";
 
 import { TOOL_SCHEMA_VERSION } from "../model/schemas.js";
 import {
@@ -25,17 +30,19 @@ export const GapSeveritySchema = z.enum([
 
 export const GapSourceSchema = z.enum(["inventory", "rule", "schema"]);
 
-export const CfnResourceSchemaSchema = z
-  .object({
-    createOnlyProperties: z.array(z.string().min(1)).default([]),
-    primaryIdentifier: z.array(z.string().min(1)).default([]),
-    properties: z.record(z.unknown()).default({}),
-    readOnlyProperties: z.array(z.string().min(1)).default([]),
-    required: z.array(z.string().min(1)).default([]),
-    typeName: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
-    writeOnlyProperties: z.array(z.string().min(1)).default([]),
-  })
-  .passthrough();
+export const CfnResourceSchemaSchema = boundedJson(
+  z
+    .object({
+      createOnlyProperties: boundedArray(z.string().min(1)).default([]),
+      primaryIdentifier: boundedArray(z.string().min(1)).default([]),
+      properties: boundedRecord(z.string(), z.unknown()).default({}),
+      readOnlyProperties: boundedArray(z.string().min(1)).default([]),
+      required: boundedArray(z.string().min(1)).default([]),
+      typeName: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
+      writeOnlyProperties: boundedArray(z.string().min(1)).default([]),
+    })
+    .passthrough(),
+);
 
 export const GapPropertyRuleSchema = z
   .object({
@@ -51,20 +58,22 @@ export const GapResourceRuleSchema = z
   .object({
     code: GapCodeSchema,
     message: z.string().min(1),
-    regionsIn: z.array(z.string().min(1)).optional(),
-    regionsNotIn: z.array(z.string().min(1)).optional(),
+    regionsIn: boundedArray(z.string().min(1)).optional(),
+    regionsNotIn: boundedArray(z.string().min(1)).optional(),
     resourceType: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
     severity: GapSeveritySchema.default("warning"),
   })
   .strict();
 
-export const GapRuleSetSchema = z
-  .object({
-    propertyRules: z.array(GapPropertyRuleSchema).default([]),
-    resourceRules: z.array(GapResourceRuleSchema).default([]),
-    version: z.string().min(1).optional(),
-  })
-  .strict();
+export const GapRuleSetSchema = boundedJson(
+  z
+    .object({
+      propertyRules: boundedArray(GapPropertyRuleSchema).default([]),
+      resourceRules: boundedArray(GapResourceRuleSchema).default([]),
+      version: z.string().min(1).optional(),
+    })
+    .strict(),
+);
 
 export const GapSuppressionSchema = z
   .object({
@@ -92,12 +101,14 @@ export const GapSuppressionSchema = z
     },
   );
 
-export const GapSuppressionSetSchema = z
-  .object({
-    suppressions: z.array(GapSuppressionSchema).default([]),
-    version: z.string().min(1).optional(),
-  })
-  .strict();
+export const GapSuppressionSetSchema = boundedJson(
+  z
+    .object({
+      suppressions: boundedArray(GapSuppressionSchema).default([]),
+      version: z.string().min(1).optional(),
+    })
+    .strict(),
+);
 
 export const GapFindingSchema = z
   .object({
@@ -126,10 +137,10 @@ export const NormalizedResourceSchema = z
       .string()
       .regex(/^\d{12}$/)
       .optional(),
-    gapCodes: z.array(GapCodeSchema).default([]),
+    gapCodes: boundedArray(GapCodeSchema).default([]),
     identifier: z.string().min(1),
     key: z.string().min(1),
-    properties: z.record(z.unknown()).default({}),
+    properties: boundedRecord(z.string(), z.unknown()).default({}),
     region: z.string().min(1),
     resourceType: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
     status: NormalizedResourceStatusSchema,
@@ -138,10 +149,10 @@ export const NormalizedResourceSchema = z
 
 export const CoverageSegmentSchema = z
   .object({
-    codeable: z.number().int().nonnegative(),
-    excluded: z.number().int().nonnegative(),
+    codeable: z.number().nonnegative().refine(Number.isInteger),
+    excluded: z.number().nonnegative().refine(Number.isInteger),
     score: z.number().min(0).max(1),
-    total: z.number().int().nonnegative(),
+    total: z.number().nonnegative().refine(Number.isInteger),
   })
   .strict();
 
@@ -152,27 +163,31 @@ export const CoverageSummarySchema = z
   })
   .strict();
 
-export const NormalizationModelDocumentSchema = z
-  .object({
-    coverage: CoverageSummarySchema,
-    externalReferences: z.array(ExternalReferenceSchema).default([]),
-    generatedAt: z.string().datetime().optional(),
-    resources: z.array(NormalizedResourceSchema),
-    scope: ScopeDocumentSchema.optional(),
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    toolVersion: z.string().min(1),
-  })
-  .strict();
+export const NormalizationModelDocumentSchema = boundedJson(
+  z
+    .object({
+      coverage: CoverageSummarySchema,
+      externalReferences: boundedArray(ExternalReferenceSchema).default([]),
+      generatedAt: z.string().datetime().optional(),
+      resources: boundedArray(NormalizedResourceSchema),
+      scope: ScopeDocumentSchema.optional(),
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      toolVersion: z.string().min(1),
+    })
+    .strict(),
+);
 
-export const GapDocumentSchema = z
-  .object({
-    coverage: CoverageSummarySchema,
-    gaps: z.array(GapFindingSchema),
-    generatedAt: z.string().datetime().optional(),
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    toolVersion: z.string().min(1),
-  })
-  .strict();
+export const GapDocumentSchema = boundedJson(
+  z
+    .object({
+      coverage: CoverageSummarySchema,
+      gaps: boundedArray(GapFindingSchema),
+      generatedAt: z.string().datetime().optional(),
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      toolVersion: z.string().min(1),
+    })
+    .strict(),
+);
 
 export type CfnResourceSchema = z.infer<typeof CfnResourceSchemaSchema>;
 export type CoverageSegment = z.infer<typeof CoverageSegmentSchema>;

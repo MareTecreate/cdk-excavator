@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { boundedArray, boundedJson } from "../model/bounded-schema.js";
 
 import { TOOL_SCHEMA_VERSION } from "../model/schemas.js";
 
@@ -19,15 +20,15 @@ export const ScopedResourceSchema = z
       .regex(/^\d{12}$/)
       .optional(),
     identifier: z.string().min(1),
-    inclusionReasons: z.array(ScopeInclusionReasonSchema).min(1),
+    inclusionReasons: boundedArray(ScopeInclusionReasonSchema, 1),
     key: z.string().min(1),
     region: z.string().min(1),
     sourceRegion: z.string().min(1).optional(),
     resourceType: z.string().regex(/^AWS::[A-Za-z0-9]+::[A-Za-z0-9]+$/),
     placement: z
       .object({
-        vpcIds: z.array(z.string()),
-        availabilityZones: z.array(z.string()),
+        vpcIds: boundedArray(z.string()),
+        availabilityZones: boundedArray(z.string()),
       })
       .strict()
       .optional(),
@@ -55,9 +56,9 @@ export const ScopeGraphEdgeSchema = z
 
 export const ScopeGraphSchema = z
   .object({
-    cycles: z.array(z.array(z.string().min(1)).min(2)).default([]),
-    edges: z.array(ScopeGraphEdgeSchema).default([]),
-    nodes: z.array(ScopeGraphNodeSchema).default([]),
+    cycles: boundedArray(boundedArray(z.string().min(1), 2)).default([]),
+    edges: boundedArray(ScopeGraphEdgeSchema).default([]),
+    nodes: boundedArray(ScopeGraphNodeSchema).default([]),
   })
   .strict();
 
@@ -73,7 +74,7 @@ export const ExternalReferenceSchema = z
     referencedBy: z.string().min(1),
     type: z.enum(["arn", "id"]),
     value: z.string().min(1),
-    propertyPaths: z.array(z.string()).optional(),
+    propertyPaths: boundedArray(z.string()).optional(),
     targetKey: z.string().optional(),
     targetResourceType: z.string().optional(),
     targetRegion: z.string().optional(),
@@ -91,18 +92,20 @@ export const ScopeWarningSchema = z
   })
   .strict();
 
-export const ScopeDocumentSchema = z
-  .object({
-    externalReferences: z.array(ExternalReferenceSchema).default([]),
-    generatedAt: z.string().datetime().optional(),
-    graph: ScopeGraphSchema.default({}),
-    mode: ScopeModeSchema,
-    resources: z.array(ScopedResourceSchema),
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    toolVersion: z.string().min(1),
-    warnings: z.array(ScopeWarningSchema).default([]),
-  })
-  .strict();
+export const ScopeDocumentSchema = boundedJson(
+  z
+    .object({
+      externalReferences: boundedArray(ExternalReferenceSchema).default([]),
+      generatedAt: z.string().datetime().optional(),
+      graph: ScopeGraphSchema.prefault({}),
+      mode: ScopeModeSchema,
+      resources: boundedArray(ScopedResourceSchema),
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      toolVersion: z.string().min(1),
+      warnings: boundedArray(ScopeWarningSchema).default([]),
+    })
+    .strict(),
+);
 
 export type BoundaryHandling = z.infer<typeof BoundaryHandlingSchema>;
 export type ExternalReference = z.infer<typeof ExternalReferenceSchema>;

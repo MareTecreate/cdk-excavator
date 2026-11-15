@@ -96,6 +96,8 @@ TypeScript / PythonのCDK下書き、`gaps.json`、日英Markdown、外部通信
 - 既知のconverter非対応は汎用L1へのfallbackと理由を `converter-fallbacks.json` に記録し、終了コード `1` にします。未知の内部エラーは停止します。
 - 生成コードはRetainを設定しますが、それだけで安全な移行を保証しません。`cdk-import-review.json`、`cdk-import-map.json`、`IMPORT.md` を確認し、差分・置換・秘密値・移植性をレビューしてから人がCDKを操作してください。S3オブジェクトのコピーは行いません。
 
+JSON入力の安全上限は、1ファイル32MiB（schema/ruleディレクトリは合計も同じ）、100万要素、配列・オブジェクトごと5万件、深さ64です。超過時はデータを切り捨てずにエラーとします。必要に応じてリージョン・リソース種別で調査を分割してください。プロセス全体のメモリ使用量を保証する値ではありません。コレクションは最初の不正要素で検証を止めるため、診断がすべてのエラーを網羅するとは限りません。
+
 ## standalone binary
 
 GitHub Releasesで配布する場合の対象はWindows x64、Linux x64、macOS arm64/x64です。v0.1.0のWindows版は未署名、macOS版はad-hoc署名のみでnotarizationなしです。OSの署名・実行ポリシーに適合しない場合は利用を控え、組織の方針に従ってください。

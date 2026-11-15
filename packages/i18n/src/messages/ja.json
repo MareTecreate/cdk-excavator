@@ -1,4 +1,10 @@
 {
+  "core.input.invalidJson": "JSON入力の構文が不正です。JSON構文を確認してください。診断には入力値を含めません。",
+  "core.input.limit.bytes": "JSON入力が安全上限の{limit}バイトを超えています。対象範囲を分割してください。データの切り捨ては行っていません。",
+  "core.input.limit.nodes": "JSON入力が安全上限の{limit}要素を超えています。対象範囲を分割してください。データの切り捨ては行っていません。",
+  "core.input.limit.collection": "JSONコレクションが安全上限の{limit}件を超えています。対象範囲を分割してください。データの切り捨ては行っていません。",
+  "core.input.limit.depth": "JSON入力に循環があるか、安全上限の深さ{limit}を超えています。入れ子を減らしてください。データの切り捨ては行っていません。",
+  "cli.error.invalidDocument": "JSONスキーマ検証に失敗しました（{path}付近、報告{count}件。検証は途中で停止する場合があります）。入力文書の形式を確認してください。診断には入力値を含めません。",
   "report.summary.project": "プロジェクト・スタック群: {stack}",
   "report.resource.candidate": "生成候補・コード生成未確認",
   "core.gap.incomplete": "リソースの取得が不完全です。収集エラーを解消して再取得し、生成結果を確認してください。",

@@ -1,4 +1,10 @@
 {
+  "core.input.invalidJson": "Invalid JSON input. Check JSON syntax; input values are not included in diagnostics.",
+  "core.input.limit.bytes": "JSON input exceeds the {limit}-byte safety limit. Split the input into smaller scopes; no data was truncated.",
+  "core.input.limit.nodes": "JSON input exceeds the {limit}-node safety limit. Split the input into smaller scopes; no data was truncated.",
+  "core.input.limit.collection": "A JSON collection exceeds the {limit}-entry safety limit. Split the input into smaller scopes; no data was truncated.",
+  "core.input.limit.depth": "JSON input is cyclic or exceeds the safety depth of {limit}. Reduce nesting; no data was truncated.",
+  "cli.error.invalidDocument": "JSON schema validation failed near {path} ({count} reported issues; validation may stop early). Check the input document format; input values are not included in diagnostics.",
   "report.summary.project": "Project / stack group: {stack}",
   "report.resource.candidate": "Codeable candidate; generation unverified",
   "core.gap.incomplete": "Resource acquisition was incomplete. Resolve inventory errors and rescan before code generation.",

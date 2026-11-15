@@ -1,8 +1,10 @@
 import { constants } from "node:fs";
-import { access, readdir, readFile, stat } from "node:fs/promises";
+import { access, stat } from "node:fs/promises";
 import { join } from "node:path";
 
 import { confirm, input, select } from "@inquirer/prompts";
+import { ZodError } from "zod";
+import { jsonFileNames, readJsonFile } from "./json-input.js";
 import { prepareQuery, queryRows, querySummary } from "./query.js";
 import { isSupportedCliNodeVersion } from "./runtime.js";
 import {
@@ -27,6 +29,10 @@ import {
   GapRuleSetSchema,
   GapSuppressionSetSchema,
   InventoryDocumentSchema,
+  JSON_INPUT_LIMITS,
+  JsonInputBudget,
+  JsonInputLimitError,
+  JsonInputSyntaxError,
   inventoryResourceKey,
   isGlobalResourceType,
   loadBundledCfnSchemas,
@@ -72,7 +78,7 @@ import {
   type SupportedLanguage,
 } from "@cdk-excavator/i18n";
 
-export const CLI_VERSION = "0.1.0";
+export const CLI_VERSION = "0.1.1";
 export const DEFAULT_SCAN_CONCURRENCY = 4;
 export const DEFAULT_SCAN_OUTPUT = "inventory.json";
 export const DEFAULT_SCOPE_OUTPUT = "scope.json";
@@ -603,7 +609,7 @@ async function runScopeCommand(parsed: ParsedArguments): Promise<CliResult> {
       stderr: [
         translator.t("cli.error.scope", {
           inventory: scope.inventory,
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           output: scope.output,
         }),
         translator.t("cli.error.hint"),
@@ -646,9 +652,7 @@ async function runNormalizeCommand(
     const gapRules = normalize.gapRulesLocal
       ? mergeLocalGapRules(
           baseGapRules,
-          JSON.parse(
-            await readFile(normalize.gapRulesLocal, "utf8"),
-          ) as unknown,
+          await readJsonFile(normalize.gapRulesLocal),
         )
       : baseGapRules;
     const suppressions = normalize.suppressions
@@ -693,7 +697,7 @@ async function runNormalizeCommand(
       stdout: "",
       stderr: [
         translator.t("cli.error.normalize", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           scope: normalize.scope,
         }),
         translator.t("cli.error.hint"),
@@ -775,7 +779,7 @@ async function runPlanCommand(parsed: ParsedArguments): Promise<CliResult> {
       stdout: "",
       stderr: [
         translator.t("cli.error.plan", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           model: plan.model,
         }),
         translator.t("cli.error.hint"),
@@ -891,7 +895,7 @@ async function runGenerateCommand(parsed: ParsedArguments): Promise<CliResult> {
       stdout: "",
       stderr: [
         translator.t("cli.error.generate", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           model: generate.model,
         }),
         translator.t("cli.error.hint"),
@@ -957,7 +961,7 @@ async function runReportCommand(parsed: ParsedArguments): Promise<CliResult> {
       stdout: "",
       stderr: [
         translator.t("cli.error.report", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           model: report.model,
         }),
         translator.t("cli.error.hint"),
@@ -1013,7 +1017,7 @@ async function runSchemasCommand(
       stdout: "",
       stderr: [
         translator.t("cli.error.schemas", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           output: options.outputDirectory,
         }),
         translator.t("cli.error.hint"),
@@ -1084,7 +1088,7 @@ async function runInteractiveCommand(
       stderr: [
         translator.t("cli.error.interactive", {
           inventory: interactive.inventory,
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           output: interactive.output,
         }),
         translator.t("cli.error.hint"),
@@ -3342,7 +3346,7 @@ async function runFixtureScanCommand(
       stdout: "",
       stderr: [
         translator.t("cli.error.scanFixture", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           path: fixturePath,
         }),
         translator.t("cli.error.hint"),
@@ -3450,7 +3454,7 @@ async function runAwsScanCommand(
       stdout: "",
       stderr: [
         translator.t("cli.error.scan", {
-          message: errorMessage(error),
+          message: errorMessage(error, translator.language),
           output: scan.output,
         }),
         translator.t("cli.error.hint"),
@@ -3460,28 +3464,25 @@ async function runAwsScanCommand(
 }
 
 async function readInventoryDocument(path: string): Promise<InventoryDocument> {
-  const content = await readFile(path, "utf8");
-  return InventoryDocumentSchema.parse(JSON.parse(content) as unknown);
+  return InventoryDocumentSchema.parse(await readJsonFile(path));
 }
 
 async function readScopeDocument(path: string): Promise<ScopeDocument> {
-  const content = await readFile(path, "utf8");
-  return ScopeDocumentSchema.parse(JSON.parse(content) as unknown);
+  return ScopeDocumentSchema.parse(await readJsonFile(path));
 }
 
 async function readCfnSchemas(
   directory: string,
 ): Promise<readonly CfnResourceSchema[]> {
-  const entries = await readdir(directory, { withFileTypes: true });
   const schemas: CfnResourceSchema[] = [];
+  const budget = new JsonInputBudget();
 
-  for (const entry of entries
-    .filter((candidate) => candidate.isFile())
-    .map((candidate) => candidate.name)
-    .filter((name) => name.endsWith(".json"))
-    .sort()) {
-    const content = await readFile(join(directory, entry), "utf8");
-    schemas.push(CfnResourceSchemaSchema.parse(JSON.parse(content) as unknown));
+  for (const entry of await jsonFileNames(directory)) {
+    schemas.push(
+      CfnResourceSchemaSchema.parse(
+        await readJsonFile(join(directory, entry), budget),
+      ),
+    );
   }
 
   if (schemas.length === 0) {
@@ -3494,17 +3495,14 @@ async function readCfnSchemas(
 }
 
 async function readGapRuleSet(directory: string): Promise<GapRuleSet> {
-  const entries = await readdir(directory, { withFileTypes: true });
   const propertyRules: GapRuleSet["propertyRules"] = [];
   const resourceRules: GapRuleSet["resourceRules"] = [];
+  const budget = new JsonInputBudget();
 
-  for (const entry of entries
-    .filter((candidate) => candidate.isFile())
-    .map((candidate) => candidate.name)
-    .filter((name) => name.endsWith(".json"))
-    .sort()) {
-    const content = await readFile(join(directory, entry), "utf8");
-    const parsed = GapRuleSetSchema.parse(JSON.parse(content) as unknown);
+  for (const entry of await jsonFileNames(directory)) {
+    const parsed = GapRuleSetSchema.parse(
+      await readJsonFile(join(directory, entry), budget),
+    );
     propertyRules.push(...parsed.propertyRules);
     resourceRules.push(...parsed.resourceRules);
   }
@@ -3521,27 +3519,23 @@ async function readGapRuleSet(directory: string): Promise<GapRuleSet> {
 }
 
 async function readGapSuppressionSet(path: string): Promise<GapSuppressionSet> {
-  const content = await readFile(path, "utf8");
-  return GapSuppressionSetSchema.parse(JSON.parse(content) as unknown);
+  return GapSuppressionSetSchema.parse(await readJsonFile(path));
 }
 
 async function readNormalizationModelDocument(
   path: string,
 ): Promise<NormalizationModelDocument> {
-  const content = await readFile(path, "utf8");
-  return NormalizationModelDocumentSchema.parse(JSON.parse(content) as unknown);
+  return NormalizationModelDocumentSchema.parse(await readJsonFile(path));
 }
 
 async function readGapDocument(path: string): Promise<GapDocument> {
-  const content = await readFile(path, "utf8");
-  return GapDocumentSchema.parse(JSON.parse(content) as unknown);
+  return GapDocumentSchema.parse(await readJsonFile(path));
 }
 
 async function readCdkImportReviewDocument(
   path: string,
 ): Promise<CdkImportMapDocument> {
-  const content = await readFile(path, "utf8");
-  return CdkImportMapDocumentSchema.parse(JSON.parse(content) as unknown);
+  return CdkImportMapDocumentSchema.parse(await readJsonFile(path));
 }
 
 function selectedReportLanguages(
@@ -4086,7 +4080,70 @@ function formatJson(value: unknown): string {
   return JSON.stringify(value, null, 2);
 }
 
-function errorMessage(error: unknown): string {
+function errorMessage(error: unknown, language?: SupportedLanguage): string {
+  const translator = createTranslator(language);
+  if (error instanceof JsonInputLimitError) {
+    return translator.t(`core.input.limit.${error.limit}`, {
+      limit: JSON_INPUT_LIMITS[error.limit],
+    });
+  }
+  if (error instanceof JsonInputSyntaxError) {
+    return translator.t("core.input.invalidJson");
+  }
+  if (error instanceof ZodError) {
+    // Only schema field names are shown; dynamic resource/tag keys are redacted.
+    const fields = new Set([
+      "schemaVersion",
+      "toolVersion",
+      "resources",
+      "scope",
+      "graph",
+      "nodes",
+      "edges",
+      "cycles",
+      "properties",
+      "tags",
+      "identifier",
+      "resourceType",
+      "region",
+      "sourceApi",
+      "service",
+      "operation",
+      "errors",
+      "coverage",
+      "codeable",
+      "excluded",
+      "total",
+      "score",
+      "gaps",
+      "externalReferences",
+      "suppressions",
+      "propertyRules",
+      "resourceRules",
+      "reason",
+      "mode",
+      "generatedAt",
+      "plan",
+      "typeName",
+      "required",
+      "readOnlyProperties",
+      "writeOnlyProperties",
+      "createOnlyProperties",
+    ]);
+    const path =
+      error.issues[0]?.path
+        .map((part) =>
+          typeof part === "number" ||
+          (typeof part === "string" && fields.has(part))
+            ? String(part)
+            : "*",
+        )
+        .join(".") || "$";
+    return translator.t("cli.error.invalidDocument", {
+      count: error.issues.length,
+      path,
+    });
+  }
   return error instanceof Error ? error.message : String(error);
 }
 

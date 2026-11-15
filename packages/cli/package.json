@@ -1,6 +1,6 @@
 {
   "name": "cdk-excavator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Review-first CLI that excavates existing AWS resources into AWS CDK drafts and gap reports.",
   "license": "Apache-2.0",
   "repository": {
@@ -49,6 +49,6 @@
     "cdk-from-cfn": "0.312.0",
     "constructs": "10.6.0",
     "jmespath": "0.16.0",
-    "zod": "^3.25.67"
+    "zod": "4.6.7"
   }
 }

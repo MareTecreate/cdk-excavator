@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { boundedArray, boundedJson, boundedRecord } from "./bounded-schema.js";
 
 export const TOOL_SCHEMA_VERSION = "0.1.0";
 
@@ -27,38 +28,38 @@ export const InventoryResourceSchema = z
       .optional(),
     region: z.string().min(1),
     sourceRegion: z.string().min(1).optional(),
-    properties: z.record(z.unknown()).default({}),
-    tags: z.record(z.string()).default({}),
+    properties: boundedRecord(z.string(), z.unknown()).default({}),
+    tags: boundedRecord(z.string(), z.string()).default({}),
     sourceApi: SourceApiSchema,
     isCloudFormationManaged: z.boolean().default(false),
-    errors: z.array(ScanErrorSchema).default([]),
-    collectionNotes: z
-      .array(
-        z
-          .object({
-            code: z.enum(["GAP-1", "GAP-4"]),
-            propertyPath: z.string().min(1),
-            messageKey: z.enum([
-              "core.gap.ec2Mapped",
-              "core.gap.ec2Split",
-              "core.gap.ec2Managed",
-              "core.gap.unmapped",
-            ]),
-          })
-          .strict(),
-      )
-      .optional(),
+    errors: boundedArray(ScanErrorSchema).default([]),
+    collectionNotes: boundedArray(
+      z
+        .object({
+          code: z.enum(["GAP-1", "GAP-4"]),
+          propertyPath: z.string().min(1),
+          messageKey: z.enum([
+            "core.gap.ec2Mapped",
+            "core.gap.ec2Split",
+            "core.gap.ec2Managed",
+            "core.gap.unmapped",
+          ]),
+        })
+        .strict(),
+    ).optional(),
   })
   .strict();
 
-export const InventoryDocumentSchema = z
-  .object({
-    schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
-    toolVersion: z.string().min(1),
-    generatedAt: z.string().datetime().optional(),
-    resources: z.array(InventoryResourceSchema),
-  })
-  .strict();
+export const InventoryDocumentSchema = boundedJson(
+  z
+    .object({
+      schemaVersion: z.literal(TOOL_SCHEMA_VERSION),
+      toolVersion: z.string().min(1),
+      generatedAt: z.string().datetime().optional(),
+      resources: boundedArray(InventoryResourceSchema),
+    })
+    .strict(),
+);
 
 export type SourceApi = z.infer<typeof SourceApiSchema>;
 export type ScanError = z.infer<typeof ScanErrorSchema>;

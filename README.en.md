@@ -96,6 +96,8 @@ The default scan covers 21 types across VPC networking, EC2, RDS, ALB, IAM and S
 - Known converter incompatibilities fall back to generic L1 with reasons in `converter-fallbacks.json` and exit `1`; unknown internal errors stop generation.
 - Retain settings do not guarantee a safe migration. Inspect `cdk-import-review.json`, `cdk-import-map.json` and `IMPORT.md`; review differences, replacements, secrets and portability before running CDK yourself. S3 object data is not copied.
 
+JSON safety limits: 32 MiB per file (and in total per schema/rule directory), 1,000,000 nodes, 50,000 entries per array/object, and nesting depth 64. Oversized input is rejected without truncation; split scans by region/resource type when needed. These are validation limits, not a total process memory guarantee. Collection validation stops at its first invalid member, so diagnostics may not list every issue.
+
 ## Standalone binaries
 
 GitHub Release binary targets are Windows x64, Linux x64, macOS arm64 and macOS x64. v0.1.0 Windows binaries are unsigned; macOS binaries are ad-hoc signed and not notarized. Follow your organization's execution/signing policy; do not use a binary that does not satisfy it.
